@@ -1,0 +1,17 @@
+.app {
+  background-color: #141414;
+  min-height: 100vh;
+}
+
+.rows-container {
+  margin-top: -100px;
+  position: relative;
+  z-index: 5;
+}
+
+.footer {
+  padding: 40px;
+  text-align: center;
+  color: #737373;
+  font-size: 0.9rem;
+}
