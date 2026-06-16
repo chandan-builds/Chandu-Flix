@@ -9,6 +9,7 @@ A premium, responsive Netflix clone built with React, Vite, and CSS.
 - **Interactive Rows:** Horizontally scrollable category rows featuring smooth hover animations.
 - **Hero Banner:** Full-width featured banner with gradient overlay for text readability.
 
+
 ## Preview
 
 Here is a quick preview of the interactive UI:
