@@ -1,0 +1,131 @@
+.search-bar-wrapper {
+  position: relative;
+}
+
+.search-icon {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.search-icon:hover {
+  opacity: 0.7;
+}
+
+.search-input-container {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 0 10px;
+  gap: 8px;
+  width: 280px;
+  animation: searchExpand 0.25s ease;
+}
+
+@keyframes searchExpand {
+  from { width: 0; opacity: 0; }
+  to { width: 280px; opacity: 1; }
+}
+
+.search-input-icon {
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 0.85rem;
+  padding: 8px 0;
+  width: 100%;
+  font-family: inherit;
+}
+
+.search-input::placeholder {
+  color: #888;
+}
+
+.search-close {
+  cursor: pointer;
+  color: #aaa;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.search-close:hover {
+  color: #fff;
+}
+
+/* ── Dropdown ── */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 360px;
+  background: rgba(20, 20, 20, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  z-index: 200;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.search-result-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.search-result-poster {
+  width: 40px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: #333;
+}
+
+.search-result-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.search-result-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-result-meta {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+@media (max-width: 600px) {
+  .search-input-container {
+    width: 200px;
+  }
+  @keyframes searchExpand {
+    from { width: 0; opacity: 0; }
+    to { width: 200px; opacity: 1; }
+  }
+  .search-dropdown {
+    width: 280px;
+  }
+}

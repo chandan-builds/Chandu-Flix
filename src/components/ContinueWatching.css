@@ -1,0 +1,88 @@
+.continue-watching-row {
+  margin-left: 4%;
+  color: white;
+  margin-bottom: 2rem;
+}
+
+.continue-watching-row h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.cw-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cw-posters {
+  display: flex;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  padding: 10px 0;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+
+.cw-posters::-webkit-scrollbar {
+  display: none;
+}
+
+.cw-card {
+  position: relative;
+  min-width: 250px;
+  cursor: pointer;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.cw-card:hover {
+  transform: scale(1.05);
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.cw-poster {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+
+.cw-progress-bar {
+  position: absolute;
+  bottom: 38px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.cw-progress-fill {
+  height: 100%;
+  background: #e50914;
+  transition: width 0.3s;
+}
+
+.cw-info {
+  background: #1a1a1a;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cw-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cw-episode {
+  font-size: 0.75rem;
+  color: #888;
+}

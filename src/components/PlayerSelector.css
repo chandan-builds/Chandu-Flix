@@ -1,0 +1,39 @@
+.player-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: fit-content;
+}
+
+.player-selector-label {
+  font-size: 14px;
+  color: #aaa;
+  font-weight: 500;
+}
+
+.player-select-dropdown {
+  background: #141414;
+  color: #fff;
+  border: 1px solid #333;
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.player-select-dropdown:hover {
+  background: #1f1f1f;
+  border-color: #e50914;
+}
+
+.player-select-dropdown:focus {
+  border-color: #e50914;
+  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.4);
+}

@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Bell, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Bell, User } from 'lucide-react';
+import SearchBar from './SearchBar';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -23,17 +25,18 @@ const Navbar = () => {
   return (
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className="navbar-left">
-        <h1 className="logo">CHANDU-FLIX</h1>
+        <Link to="/" className="logo-link">
+          <h1 className="logo">CHANDU-FLIX</h1>
+        </Link>
         <ul className="nav-links">
-          <li>Home</li>
-          <li>TV Shows</li>
-          <li>Movies</li>
-          <li>New & Popular</li>
-          <li>My List</li>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/search?type=tv">TV Shows</Link></li>
+          <li><Link to="/search?type=movie">Movies</Link></li>
+          <li><Link to="/search">New & Popular</Link></li>
         </ul>
       </div>
       <div className="navbar-right">
-        <Search className="icon" />
+        <SearchBar />
         <span>Kids</span>
         <Bell className="icon" />
         <div className="profile">
