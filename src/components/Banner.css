@@ -223,12 +223,155 @@
   border-radius: 5px;
 }
 
-@media (max-width: 768px) {
-  .banner-title {
-    font-size: 2rem;
+/* ── Tablet ── */
+@media (max-width: 1024px) {
+  .banner {
+    height: 65vh;
   }
+
+  .banner-contents {
+    max-width: 480px;
+    padding-top: 20vh;
+  }
+
+  .banner-title {
+    font-size: 2.4rem;
+  }
+
   .banner-description {
-    font-size: 0.9rem;
     width: 100%;
+    font-size: 0.95rem;
+  }
+
+  .banner-button {
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .banner {
+    height: 55vh;
+  }
+
+  .banner-contents {
+    max-width: 85%;
+    padding-top: 16vh;
+    margin-left: 5%;
+  }
+
+  .banner-title {
+    font-size: 1.8rem;
+    line-height: 1.15;
+  }
+
+  .banner-meta {
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+  }
+
+  .banner-rating {
+    font-size: 0.85rem;
+  }
+
+  .banner-year {
+    font-size: 0.8rem;
+  }
+
+  .banner-type {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+  }
+
+  .banner-description {
+    width: 100%;
+    font-size: 0.85rem;
+    padding-top: 0.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .banner-buttons {
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+
+  .banner-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    border-radius: 4px;
+  }
+
+  .banner-fadeBottom {
+    height: 8rem;
+  }
+
+  /* Arrows: smaller on mobile */
+  .banner-arrow {
+    padding: 0.6rem 0.3rem;
+  }
+
+  .banner-arrow svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Dots: smaller on mobile */
+  .banner-dots {
+    bottom: 2.5rem;
+    gap: 6px;
+  }
+
+  .banner-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .banner-dot.active {
+    width: 18px;
+  }
+}
+
+/* ── Small Mobile ── */
+@media (max-width: 480px) {
+  .banner {
+    height: 50vh;
+  }
+
+  .banner-contents {
+    max-width: 90%;
+    padding-top: 14vh;
+    margin-left: 4%;
+  }
+
+  .banner-title {
+    font-size: 1.4rem;
+  }
+
+  .banner-description {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .banner-buttons {
+    flex-wrap: wrap;
+  }
+
+  .banner-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .banner-arrow {
+    padding: 0.5rem 0.25rem;
+  }
+
+  .banner-dots {
+    bottom: 2rem;
   }
 }

@@ -16,3 +16,27 @@
   color: var(--text-secondary);
   font-size: 0.9rem;
 }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .rows-container {
+    margin-top: -60px;
+    padding-bottom: 40px;
+  }
+
+  .footer {
+    padding: 24px 16px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .rows-container {
+    margin-top: -40px;
+    padding-bottom: 30px;
+  }
+
+  .footer {
+    padding: 20px 12px;
+  }
+}

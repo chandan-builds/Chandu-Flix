@@ -37,3 +37,38 @@
   border-color: #e50914;
   box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.4);
 }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .player-selector-container {
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px 12px;
+    margin: 12px 0;
+  }
+
+  .player-selector-label {
+    font-size: 13px;
+  }
+
+  .player-select-dropdown {
+    font-size: 13px;
+    padding: 8px 12px;
+    flex: 1;
+    max-width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .player-selector-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .player-select-dropdown {
+    width: 100%;
+    max-width: none;
+    padding: 10px 12px;
+  }
+}

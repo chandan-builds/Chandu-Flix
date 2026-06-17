@@ -47,10 +47,34 @@ body {
   scrollbar-width: none;  /* Firefox */
 }
 
+/* Tap target / Touch improvements */
+a, button, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Reusable Glass Utility */
 .glass {
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--glass-border);
+}
+
+/* ── Responsive Base ── */
+@media (max-width: 1024px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 13.5px;
+  }
 }

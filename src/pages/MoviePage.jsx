@@ -5,6 +5,7 @@ import { fetchMovieDetails, TMDB_IMAGE } from '../tmdb';
 import { getProgress } from '../watchHistory';
 import VidKingPlayer from '../components/VidKingPlayer';
 import PeachifyPlayer from '../components/PeachifyPlayer';
+import VidsrcPlayer from '../components/VidsrcPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import './MoviePage.css';
 
@@ -74,7 +75,7 @@ const MoviePage = () => {
               poster_path={movie.poster_path}
               backdrop_path={movie.backdrop_path}
             />
-          ) : (
+          ) : activePlayer === 'vidking' ? (
             <VidKingPlayer
               mediaType="movie"
               tmdbId={id}
@@ -82,6 +83,12 @@ const MoviePage = () => {
               title={movie.title}
               poster_path={movie.poster_path}
               backdrop_path={movie.backdrop_path}
+            />
+          ) : (
+            <VidsrcPlayer
+              mediaType="movie"
+              tmdbId={id}
+              title={movie.title}
             />
           )}
           <PlayerSelector onPlayerChange={setActivePlayer} />

@@ -45,3 +45,17 @@
     transform: rotate(360deg);
   }
 }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .peachify-player-wrapper {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 4px;
+  }
+}

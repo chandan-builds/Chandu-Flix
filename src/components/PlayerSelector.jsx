@@ -24,6 +24,7 @@ const PlayerSelector = ({ onPlayerChange }) => {
       >
         <option value="peachify">Peachify Player (Multi-language & Quality)</option>
         <option value="vidking">VidKing Player (High Speed)</option>
+        <option value="vidsrc">Vidsrc Player (No Popups)</option>
       </select>
     </div>
   );

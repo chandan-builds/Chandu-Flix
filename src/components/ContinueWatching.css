@@ -86,3 +86,76 @@
   font-size: 0.75rem;
   color: #888;
 }
+
+/* ── Tablet ── */
+@media (max-width: 1024px) {
+  .cw-card {
+    min-width: 220px;
+  }
+
+  .cw-poster {
+    height: 125px;
+  }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .continue-watching-row {
+    margin-left: 3%;
+    margin-bottom: 1.5rem;
+  }
+
+  .continue-watching-row h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .cw-posters {
+    gap: 8px;
+    padding-right: 3%;
+  }
+
+  .cw-card {
+    min-width: 180px;
+  }
+
+  .cw-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .cw-poster {
+    height: 100px;
+  }
+
+  .cw-progress-bar {
+    bottom: 34px;
+  }
+
+  .cw-info {
+    padding: 6px 8px;
+  }
+
+  .cw-title {
+    font-size: 0.8rem;
+  }
+
+  .cw-episode {
+    font-size: 0.7rem;
+  }
+}
+
+/* ── Small Mobile ── */
+@media (max-width: 480px) {
+  .cw-card {
+    min-width: 150px;
+  }
+
+  .cw-poster {
+    height: 85px;
+  }
+
+  .continue-watching-row h2 {
+    font-size: 1rem;
+  }
+}

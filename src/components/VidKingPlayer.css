@@ -17,3 +17,11 @@
   height: 100%;
   border: 0;
 }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .vidking-player-wrapper {
+    border-radius: 0;
+    box-shadow: none;
+  }
+}

@@ -242,19 +242,164 @@
   margin: 0;
 }
 
-/* ── Responsive ── */
-@media (max-width: 768px) {
-  .tv-title {
-    font-size: 2rem;
-  }
+/* ── Tablet ── */
+@media (max-width: 1024px) {
   .tv-hero {
     height: 65vh;
   }
+
+  .tv-title {
+    font-size: 2.4rem;
+  }
+
+  .tv-hero-content {
+    max-width: 480px;
+  }
+
+  .episode-thumb-wrapper {
+    width: 190px;
+    height: 107px;
+  }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .tv-page {
+    padding-bottom: 40px;
+  }
+
+  .tv-hero {
+    height: 55vh;
+  }
+
+  .tv-hero-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.6) 40%,
+      rgba(0, 0, 0, 0.3) 100%
+    );
+    align-items: flex-end;
+    padding: 0 5% 30px;
+  }
+
+  .tv-hero-content {
+    max-width: 100%;
+    padding-top: 0;
+  }
+
+  .tv-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tv-meta {
+    gap: 8px;
+  }
+
+  .tv-genres {
+    font-size: 0.8rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .tv-overview {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .play-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 24px;
+    font-size: 0.95rem;
+  }
+
+  .tv-hero-fade {
+    height: 100px;
+  }
+
+  .now-playing-info h3 {
+    font-size: 0.95rem;
+  }
+
+  .tv-content-section {
+    padding: 16px 4%;
+  }
+
+  .season-selector {
+    margin-bottom: 1rem;
+  }
+
+  .season-selector h2 {
+    font-size: 1.15rem;
+  }
+
+  .season-dropdown {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  /* Episode cards stack vertically */
   .episode-card {
     flex-direction: column;
+    gap: 10px;
+    padding: 12px;
   }
+
   .episode-thumb-wrapper {
     width: 100%;
     height: 180px;
+  }
+
+  .episode-play-overlay {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .episode-name {
+    font-size: 0.9rem;
+  }
+
+  .episode-desc {
+    font-size: 0.75rem;
+  }
+
+  .episode-grid {
+    gap: 12px;
+  }
+
+  /* Player section edge-to-edge */
+  .player-section {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 60px;
+  }
+}
+
+/* ── Small Mobile ── */
+@media (max-width: 480px) {
+  .tv-hero {
+    height: 50vh;
+  }
+
+  .tv-title {
+    font-size: 1.5rem;
+  }
+
+  .tv-overview {
+    font-size: 0.8rem;
+  }
+
+  .episode-thumb-wrapper {
+    height: 150px;
+  }
+
+  .episode-card {
+    padding: 10px;
+  }
+
+  .season-selector h2 {
+    font-size: 1rem;
   }
 }

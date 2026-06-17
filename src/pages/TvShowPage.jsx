@@ -5,6 +5,7 @@ import { fetchTvDetails, fetchTvSeason, TMDB_IMAGE } from '../tmdb';
 import { getProgress } from '../watchHistory';
 import VidKingPlayer from '../components/VidKingPlayer';
 import PeachifyPlayer from '../components/PeachifyPlayer';
+import VidsrcPlayer from '../components/VidsrcPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import './TvShowPage.css';
 
@@ -112,7 +113,7 @@ const TvShowPage = () => {
               poster_path={show.poster_path}
               backdrop_path={currentEpisode?.still_path || show.backdrop_path}
             />
-          ) : (
+          ) : activePlayer === 'vidking' ? (
             <VidKingPlayer
               mediaType="tv"
               tmdbId={id}
@@ -122,6 +123,14 @@ const TvShowPage = () => {
               title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
               poster_path={show.poster_path}
               backdrop_path={currentEpisode?.still_path || show.backdrop_path}
+            />
+          ) : (
+            <VidsrcPlayer
+              mediaType="tv"
+              tmdbId={id}
+              season={selectedSeason}
+              episode={selectedEpisode}
+              title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
             />
           )}
           <div className="now-playing-info">
