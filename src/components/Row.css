@@ -307,3 +307,112 @@
     width: 30px;
   }
 }
+
+/* ── Loading Skeletons ── */
+.skeleton-card {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.row-skeleton-img {
+  width: 100%;
+  max-height: 150px;
+  min-height: 120px;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: row-skeleton-wave 1.5s ease-in-out infinite;
+}
+
+.row-skeleton-img.large {
+  min-height: 250px;
+  max-height: 300px;
+  aspect-ratio: 2/3;
+}
+
+@keyframes row-skeleton-wave {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Error State ── */
+.row-error {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  margin-right: 4%;
+}
+
+.row-error p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.row-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+
+.row-retry-btn:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+.row-retry-btn:active {
+  transform: scale(0.95);
+}
+
+/* ── Skeleton responsive ── */
+@media (max-width: 768px) {
+  .row-skeleton-img {
+    min-height: 90px;
+    max-height: 110px;
+  }
+
+  .row-skeleton-img.large {
+    min-height: 180px;
+    max-height: 220px;
+  }
+
+  .row-error {
+    padding: 16px 12px;
+    gap: 12px;
+    margin-right: 3%;
+  }
+
+  .row-error p {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .row-skeleton-img {
+    min-height: 75px;
+    max-height: 90px;
+  }
+
+  .row-skeleton-img.large {
+    min-height: 150px;
+    max-height: 190px;
+  }
+}

@@ -1,31 +1,39 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Info, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, Info, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import requests, { TMDB_IMAGE } from '../tmdb';
 import './Banner.css';
 
 const Banner = () => {
   const [movies, setMovies] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const truncate = (str, n) => {
     return str?.length > n ? str.substr(0, n - 1) + "..." : str;
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch(requests.fetchTrending);
-        const data = await response.json();
-        const results = data.results || [];
-        // Keep the top 5 trending popular movies/shows
-        setMovies(results.slice(0, 5));
-      } catch (err) {
-        console.error("Failed to fetch banner:", err);
-      }
+  const fetchBanner = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const response = await fetch(requests.fetchTrending);
+      const data = await response.json();
+      const results = data.results || [];
+      setMovies(results.slice(0, 5));
+      if (results.length === 0) setError(true);
+    } catch (err) {
+      console.error("Failed to fetch banner:", err);
+      setError(true);
+    } finally {
+      setLoading(false);
     }
-    fetchData();
+  };
+
+  useEffect(() => {
+    fetchBanner();
   }, []);
 
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -47,8 +55,35 @@ const Banner = () => {
     return () => clearInterval(interval);
   }, [movies, activeIndex]);
 
-  if (movies.length === 0) {
-    return <header className="banner banner-loading" />;
+  if (loading) {
+    return (
+      <header className="banner banner-loading">
+        <div className="banner-loading-content">
+          <div className="banner-skeleton-title" />
+          <div className="banner-skeleton-meta" />
+          <div className="banner-skeleton-desc" />
+          <div className="banner-skeleton-desc short" />
+          <div className="banner-skeleton-buttons">
+            <div className="banner-skeleton-btn" />
+            <div className="banner-skeleton-btn" />
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  if (error || movies.length === 0) {
+    return (
+      <header className="banner banner-error">
+        <div className="banner-error-content">
+          <h2>Unable to load content</h2>
+          <p>Please check your internet connection and try again.</p>
+          <button className="banner-retry-btn" onClick={fetchBanner}>
+            <RefreshCw size={18} /> Retry
+          </button>
+        </div>
+      </header>
+    );
   }
 
   const handlePrev = (e) => {
