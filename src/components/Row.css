@@ -318,6 +318,11 @@
     box-shadow: none;
   }
 
+  .row-poster-container:active {
+    transform: scale(0.96);
+    opacity: 0.85;
+  }
+
   .slider-arrow {
     width: 32px;
     height: 32px;

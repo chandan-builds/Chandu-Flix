@@ -41,6 +41,7 @@
   position: absolute;
   inset: 0;
   z-index: 2;
+  pointer-events: none;
   background:
     linear-gradient(to right, rgba(9, 9, 11, 0.85) 0%, rgba(9, 9, 11, 0.4) 50%, transparent 100%);
 }
@@ -53,6 +54,7 @@
   right: 0;
   height: 40%;
   z-index: 2;
+  pointer-events: none;
   background: linear-gradient(to top, var(--bg-primary) 0%, transparent 100%);
 }
 
