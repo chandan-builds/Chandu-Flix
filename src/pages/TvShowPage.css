@@ -87,6 +87,7 @@
   width: 100%;
   height: 160px;
   background: linear-gradient(transparent, #141414);
+  pointer-events: none;
 }
 
 /* ── Now Playing Info ── */
@@ -313,6 +314,9 @@
     justify-content: center;
     padding: 10px 24px;
     font-size: 0.95rem;
+    position: relative;
+    z-index: 10;
+    touch-action: manipulation;
   }
 
   .tv-hero-fade {
