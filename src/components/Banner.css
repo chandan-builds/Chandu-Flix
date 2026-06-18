@@ -1,21 +1,22 @@
+/* ════════════════════════════════════════════════
+   Banner — CinePro Style
+   ════════════════════════════════════════════════ */
+
 .banner {
   color: white;
-  object-fit: contain;
-  height: 80vh;
+  height: 85vh;
   position: relative;
   overflow: hidden;
 }
 
+/* ── Slide System ── */
 .banner-slide {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   z-index: 1;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.8s ease-in-out;
+  transition: opacity 1s ease-in-out;
 }
 
 .banner-slide.active {
@@ -26,25 +27,226 @@
 
 .banner-background {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background-size: cover;
-  background-position: center center;
+  background-position: center 20%;
   z-index: 1;
   will-change: transform, opacity;
   transition: transform 0.05s ease-out, opacity 0.6s ease-in-out;
 }
 
+/* Gradient overlays for text readability */
+.banner-slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(to right, rgba(9, 9, 11, 0.85) 0%, rgba(9, 9, 11, 0.4) 50%, transparent 100%);
+}
+
+.banner-slide::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  z-index: 2;
+  background: linear-gradient(to top, var(--bg-primary) 0%, transparent 100%);
+}
+
+/* ── Content ── */
+.banner-contents {
+  position: relative;
+  z-index: 3;
+  padding-top: 22vh;
+  margin-left: var(--page-padding);
+  max-width: 550px;
+  animation: fadeInUp 0.8s var(--ease-out);
+}
+
+.banner-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.banner-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.banner-rating {
+  color: var(--accent-color);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.banner-year {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.banner-type {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  backdrop-filter: blur(8px);
+}
+
+.banner-description {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 480px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+/* ── Pill Buttons ── */
+.banner-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.banner-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 12px 28px;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.banner-button.play {
+  background: var(--accent-color);
+  color: white;
+  box-shadow: 0 4px 20px rgba(220, 38, 38, 0.35);
+}
+
+.banner-button.play:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(220, 38, 38, 0.45);
+}
+
+.banner-button.info {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.banner-button.info:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.banner-button:active {
+  transform: scale(0.97);
+}
+
+/* ── Navigation Arrows ── */
+.banner-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.banner-arrow:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.banner-arrow.left {
+  left: var(--page-padding);
+}
+
+.banner-arrow.right {
+  right: var(--page-padding);
+}
+
+/* ── Dot Indicators ── */
+.banner-dots {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+
+.banner-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+}
+
+.banner-dot.active {
+  width: 24px;
+  background: var(--accent-color);
+}
+
+/* ── Fade to body ── */
+.banner-fadeBottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 3;
+}
+
+/* ── Loading Skeleton ── */
 .banner-loading {
-  background: linear-gradient(135deg, #141414 0%, #1a1a2e 50%, #141414 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
   display: flex;
   align-items: flex-end;
 }
 
 .banner-loading-content {
-  margin-left: 4%;
+  margin-left: var(--page-padding);
   padding-bottom: 15vh;
   width: 50%;
   max-width: 500px;
@@ -53,33 +255,36 @@
 .banner-skeleton-title {
   width: 80%;
   height: 36px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
   margin-bottom: 12px;
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background-size: 200% 100%;
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 100%);
 }
 
 .banner-skeleton-meta {
   width: 40%;
   height: 18px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-sm);
   margin-bottom: 16px;
-  animation: skeleton-pulse 1.5s ease-in-out infinite 0.1s;
+  animation: shimmer 1.5s ease-in-out infinite 0.1s;
+  background-size: 200% 100%;
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 100%);
 }
 
 .banner-skeleton-desc {
   width: 100%;
   height: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
+  background-size: 200% 100%;
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 100%);
+  border-radius: var(--radius-sm);
   margin-bottom: 8px;
-  animation: skeleton-pulse 1.5s ease-in-out infinite 0.2s;
+  animation: shimmer 1.5s ease-in-out infinite 0.2s;
 }
 
-.banner-skeleton-desc.short {
-  width: 60%;
-}
+.banner-skeleton-desc.short { width: 60%; }
 
 .banner-skeleton-buttons {
   display: flex;
@@ -90,19 +295,15 @@
 .banner-skeleton-btn {
   width: 120px;
   height: 44px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  animation: skeleton-pulse 1.5s ease-in-out infinite 0.3s;
-}
-
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+  background-size: 200% 100%;
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 100%);
+  border-radius: var(--radius-full);
+  animation: shimmer 1.5s ease-in-out infinite 0.3s;
 }
 
 /* ── Error State ── */
 .banner-error {
-  background: linear-gradient(135deg, #141414 0%, #1c1020 50%, #141414 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,20 +311,19 @@
 
 .banner-error-content {
   text-align: center;
-  padding: 20px;
+  animation: fadeInUp 0.5s var(--ease-out);
 }
 
 .banner-error-content h2 {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 8px;
-  color: var(--text-primary);
 }
 
 .banner-error-content p {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  margin-bottom: 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 24px;
 }
 
 .banner-retry-btn {
@@ -133,359 +333,146 @@
   background: var(--accent-color);
   color: white;
   border: none;
-  padding: 12px 28px;
-  border-radius: 4px;
-  font-size: 1rem;
+  padding: 12px 32px;
+  border-radius: var(--radius-full);
+  font-size: 0.95rem;
   font-weight: 600;
-  cursor: pointer;
   font-family: inherit;
-  transition: background 0.2s, transform 0.2s;
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
 .banner-retry-btn:hover {
-  background: #ff1a25;
-  transform: scale(1.03);
+  background: var(--accent-hover);
+  transform: translateY(-1px);
 }
 
-.banner-retry-btn:active {
-  transform: scale(0.97);
-}
-
-.banner-contents {
-  margin-left: 4%;
-  padding-top: 25vh;
-  height: auto;
-  max-width: 600px;
-  position: relative;
-  z-index: 3;
-  will-change: transform, opacity;
-  transition: transform 0.05s ease-out, opacity 0.6s ease-in-out;
-}
-
-.banner-title {
-  font-size: 3rem;
-  font-weight: 800;
-  padding-bottom: 0.3rem;
-  margin: 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-.banner-meta {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 0.6rem;
-  flex-wrap: wrap;
-}
-
-.banner-rating {
-  color: #46d369;
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-.banner-year {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.95rem;
-  font-weight: 500;
-}
-
-.banner-type {
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.15rem 0.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 3px;
-}
-
-.banner-description {
-  width: 45rem;
-  line-height: 1.5;
-  padding-top: 0.8rem;
-  font-size: 1.05rem;
-  font-weight: 400;
-  max-width: 100%;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.45);
-  margin: 0;
-}
-
-.banner-buttons {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.banner-button {
-  cursor: pointer;
-  color: #fff;
-  outline: none;
-  border: none;
-  font-weight: 600;
-  border-radius: 4px;
-  padding: 0.8rem 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-size: 1.1rem;
-  transition: all 0.2s;
-}
-
-.banner-button.play {
-  background-color: white;
-  color: black;
-}
-
-.banner-button.play:hover {
-  background-color: rgba(255, 255, 255, 0.75);
-}
-
-.banner-button.info {
-  background-color: rgba(109, 109, 110, 0.7);
-}
-
-.banner-button.info:hover {
-  background-color: rgba(109, 109, 110, 0.4);
-}
-
-.banner-fadeBottom {
-  height: 12.8rem;
-  background-image: linear-gradient(
-    180deg,
-    transparent,
-    rgba(37, 37, 37, 0.61),
-    #141414
-  );
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  z-index: 2;
-}
-
-/* Banner Slide Arrows */
-.banner-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.3);
-  color: white;
-  border: none;
-  cursor: pointer;
-  z-index: 4;
-  padding: 1rem 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: background 0.2s, transform 0.2s;
-  outline: none;
-}
-
-.banner-arrow:hover {
-  background: rgba(229, 9, 20, 0.8);
-  transform: translateY(-50%) scale(1.1);
-}
-
-.banner-arrow.left {
-  left: 2%;
-}
-
-.banner-arrow.right {
-  right: 2%;
-}
-
-/* Slide indicators / dots */
-.banner-dots {
-  position: absolute;
-  bottom: 3.5rem;
-  right: 4%;
-  display: flex;
-  gap: 8px;
-  z-index: 4;
-}
-
-.banner-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  transition: background 0.3s, transform 0.3s;
-}
-
-.banner-dot:hover {
-  background: rgba(255, 255, 255, 0.8);
-  transform: scale(1.2);
-}
-
-.banner-dot.active {
-  background: #e50914;
-  width: 24px;
-  border-radius: 5px;
-}
+/* ════════════════════════════════════════════════
+   Responsive
+   ════════════════════════════════════════════════ */
 
 /* ── Tablet ── */
 @media (max-width: 1024px) {
   .banner {
-    height: 65vh;
+    height: 75vh;
   }
 
   .banner-contents {
-    max-width: 480px;
+    max-width: 55%;
     padding-top: 20vh;
   }
 
   .banner-title {
-    font-size: 2.4rem;
-  }
-
-  .banner-description {
-    width: 100%;
-    font-size: 0.95rem;
+    font-size: 2.6rem;
   }
 
   .banner-button {
-    padding: 0.7rem 1.5rem;
-    font-size: 1rem;
+    padding: 10px 24px;
+    font-size: 0.9rem;
   }
 }
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .banner {
-    height: 55vh;
+    height: 65vh;
+  }
+
+  .banner-slide::before {
+    background:
+      linear-gradient(to top, rgba(9, 9, 11, 0.9) 0%, rgba(9, 9, 11, 0.3) 60%, transparent 100%);
   }
 
   .banner-contents {
-    max-width: 85%;
-    padding-top: 16vh;
-    margin-left: 5%;
+    max-width: 90%;
+    padding-top: 30vh;
+    margin-left: var(--page-padding);
   }
 
   .banner-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
     line-height: 1.15;
   }
 
   .banner-meta {
-    gap: 0.6rem;
-    margin-top: 0.4rem;
+    gap: 8px;
+    margin-bottom: 10px;
   }
 
-  .banner-rating {
-    font-size: 0.85rem;
-  }
-
-  .banner-year {
-    font-size: 0.8rem;
-  }
-
-  .banner-type {
-    font-size: 0.7rem;
-    padding: 0.1rem 0.4rem;
-  }
+  .banner-rating { font-size: 0.85rem; }
+  .banner-year { font-size: 0.8rem; }
+  .banner-type { font-size: 0.65rem; padding: 2px 8px; }
 
   .banner-description {
-    width: 100%;
     font-size: 0.85rem;
-    padding-top: 0.5rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    -webkit-line-clamp: 2;
+    margin-bottom: 16px;
   }
 
   .banner-buttons {
-    gap: 0.6rem;
-    margin-top: 1rem;
+    gap: 10px;
   }
 
   .banner-button {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 0.85rem;
   }
 
-  .banner-fadeBottom {
-    height: 8rem;
-  }
-
-  /* Arrows: smaller on mobile */
   .banner-arrow {
-    padding: 0.6rem 0.3rem;
+    width: 34px;
+    height: 34px;
   }
 
   .banner-arrow svg {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
   }
 
-  /* Dots: smaller on mobile */
   .banner-dots {
-    bottom: 2.5rem;
+    bottom: 2rem;
     gap: 6px;
   }
 
   .banner-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   .banner-dot.active {
     width: 18px;
   }
 
-  /* Loading / Error mobile */
   .banner-loading-content {
     width: 70%;
     padding-bottom: 10vh;
   }
 
-  .banner-skeleton-title {
-    height: 28px;
-  }
+  .banner-skeleton-title { height: 28px; }
+  .banner-skeleton-btn { width: 100px; height: 38px; }
 
-  .banner-skeleton-btn {
-    width: 100px;
-    height: 38px;
-  }
-
-  .banner-error-content h2 {
-    font-size: 1.2rem;
-  }
-
-  .banner-error-content p {
-    font-size: 0.85rem;
-  }
-
-  .banner-retry-btn {
-    padding: 10px 22px;
-    font-size: 0.9rem;
-  }
+  .banner-error-content h2 { font-size: 1.2rem; }
+  .banner-error-content p { font-size: 0.85rem; }
+  .banner-retry-btn { padding: 10px 24px; font-size: 0.85rem; }
 }
 
 /* ── Small Mobile ── */
 @media (max-width: 480px) {
   .banner {
-    height: 50vh;
+    height: 60vh;
   }
 
   .banner-contents {
-    max-width: 90%;
-    padding-top: 14vh;
-    margin-left: 4%;
+    max-width: 92%;
+    padding-top: 25vh;
   }
 
   .banner-title {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
   }
 
   .banner-description {
-    font-size: 0.8rem;
     -webkit-line-clamp: 2;
+    font-size: 0.8rem;
   }
 
   .banner-buttons {
@@ -493,27 +480,33 @@
   }
 
   .banner-button {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
+    padding: 9px 18px;
+    font-size: 0.8rem;
     flex: 1;
+    justify-content: center;
     min-width: 0;
   }
 
   .banner-arrow {
-    padding: 0.5rem 0.25rem;
+    width: 30px;
+    height: 30px;
   }
 
   .banner-dots {
-    bottom: 2rem;
+    bottom: 1.5rem;
   }
 
-  /* Loading / Error small mobile */
   .banner-loading-content {
     width: 80%;
     padding-bottom: 8vh;
   }
 
-  .banner-skeleton-title {
-    height: 24px;
+  .banner-skeleton-title { height: 24px; }
+}
+
+/* Disable hover on touch */
+@media (hover: none) {
+  .banner-arrow {
+    background: rgba(255, 255, 255, 0.1);
   }
 }
