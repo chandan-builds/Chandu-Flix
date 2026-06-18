@@ -1,5 +1,5 @@
 const API_KEY = "e1e4daa6fae8499bb36b579d3c7890d1";
-const BASE_URL = "https://api.themoviedb.org/3";
+const BASE_URL = "/tmdb";
 const IMAGE_BASE = "https://image.tmdb.org/t/p";
 
 export const TMDB_IMAGE = {
