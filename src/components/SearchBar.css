@@ -275,20 +275,20 @@
   }
 
   .search-overlay {
-    align-items: flex-end;
-    padding-top: 0;
+    align-items: flex-start;
+    padding-top: 12vh;
   }
 
   .search-modal {
-    width: 100%;
-    max-width: 100%;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    animation: slideUp 0.3s var(--ease-out);
-    max-height: 85vh;
+    width: 92%;
+    max-width: 92%;
+    border-radius: var(--radius-lg);
+    animation: fadeInScale 0.25s var(--ease-spring);
+    max-height: 70vh;
   }
 
   .search-modal-input-wrap {
-    padding: 16px;
+    padding: 14px 14px;
   }
 
   .search-modal-input {
@@ -296,24 +296,30 @@
   }
 
   .search-modal-results {
-    max-height: calc(85vh - 60px);
+    max-height: calc(70vh - 56px);
   }
 
   .search-result-item {
-    padding: 12px 16px;
+    padding: 10px 14px;
   }
 
   .search-view-all {
-    margin: 8px 16px 16px;
-    width: calc(100% - 32px);
-    padding: 14px 16px;
-    font-size: 0.9rem;
+    margin: 8px 14px 14px;
+    width: calc(100% - 28px);
+    padding: 12px 16px;
+    font-size: 0.85rem;
   }
 }
 
 @media (max-width: 480px) {
+  .search-overlay {
+    padding-top: 10vh;
+  }
+
   .search-modal {
-    max-height: 80vh;
+    width: 94%;
+    max-width: 94%;
+    max-height: 72vh;
   }
 
   .search-result-poster {
