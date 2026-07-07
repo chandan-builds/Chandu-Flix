@@ -132,38 +132,34 @@
   align-items: center;
   gap: 8px;
   font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
   border: none;
-  border-radius: var(--radius-full);
-  padding: 12px 28px;
+  border-radius: var(--radius-sm);
+  padding: 11px 28px;
   transition: all var(--transition-fast);
   white-space: nowrap;
 }
 
+/* Netflix primary CTA — solid white */
 .banner-button.play {
-  background: var(--accent-color);
-  color: white;
-  box-shadow: 0 4px 20px rgba(220, 38, 38, 0.35);
+  background: #fff;
+  color: #000;
 }
 
 .banner-button.play:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(220, 38, 38, 0.45);
+  background: rgba(255, 255, 255, 0.78);
 }
 
+/* Netflix secondary CTA — translucent grey */
 .banner-button.info {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--btn-grey);
   color: var(--text-primary);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .banner-button.info:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
+  background: var(--btn-grey-hover);
 }
 
 .banner-button:active {
@@ -295,11 +291,11 @@
 }
 
 .banner-skeleton-btn {
-  width: 120px;
-  height: 44px;
+  width: 130px;
+  height: 46px;
   background-size: 200% 100%;
   background-image: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 100%);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   animation: shimmer 1.5s ease-in-out infinite 0.3s;
 }
 

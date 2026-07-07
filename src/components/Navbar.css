@@ -1,86 +1,71 @@
 /* ════════════════════════════════════════════════
-   Navbar — CinePro Style
+   Navbar — Netflix Style
    ════════════════════════════════════════════════ */
 
 .navbar {
   position: fixed;
   top: 0;
   width: 100%;
-  padding: 16px var(--page-padding);
+  padding: 18px var(--page-padding);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all var(--transition-smooth);
+  transition: background var(--transition-smooth), padding var(--transition-smooth);
   z-index: 100;
   color: var(--text-primary);
+  /* Top-to-bottom scrim keeps logo/links readable over bright artwork */
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.75) 0%,
+    rgba(0, 0, 0, 0.35) 55%,
+    transparent 100%
+  );
 }
 
 .navbar.scrolled {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--bg-primary);
   border-bottom: 1px solid var(--glass-border);
   padding: 12px var(--page-padding);
 }
 
-/* ── Logo ── */
+/* ── Left: Logo + Links ── */
 .navbar-left {
   display: flex;
   align-items: center;
+  gap: 28px;
   flex-shrink: 0;
 }
 
 .logo-link {
   display: flex;
   align-items: center;
-  gap: 8px;
   text-decoration: none;
 }
 
-.logo-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: var(--accent-color);
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: white;
-  letter-spacing: 0;
-  flex-shrink: 0;
-}
-
 .logo {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--accent-color);
   margin: 0;
   letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  text-shadow: 0 2px 12px rgba(229, 9, 20, 0.35);
+  transition: transform var(--transition-fast);
 }
 
-/* ── Center: Search Pill ── */
-.navbar-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+.logo-link:hover .logo {
+  transform: scale(1.02);
 }
 
-/* ── Right ── */
-.navbar-right {
+.navbar-links {
   display: flex;
   align-items: center;
   gap: 20px;
-  flex-shrink: 0;
-}
-
-.navbar-mobile-search {
-  display: none;
 }
 
 .nav-text-link {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-secondary);
   text-decoration: none;
@@ -92,76 +77,67 @@
   color: var(--text-primary);
 }
 
+/* ── Right ── */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-shrink: 0;
+}
+
 .profile {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  background: var(--bg-elevated);
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--accent-color), #b0060f);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: var(--transition-fast);
-  border: 1px solid var(--glass-border);
-  color: var(--text-secondary);
+  color: #fff;
 }
 
 .profile:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: var(--text-primary);
+  transform: scale(1.05);
+  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.4);
 }
 
 /* ── Tablet ── */
 @media (max-width: 1024px) {
-  .navbar-center {
-    position: static;
-    transform: none;
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    margin: 0 16px;
+  .navbar-left {
+    gap: 20px;
+  }
+
+  .navbar-links {
+    gap: 16px;
   }
 
   .navbar-right {
-    gap: 14px;
+    gap: 16px;
   }
 }
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .navbar {
-    padding: 12px var(--page-padding);
+    padding: 14px var(--page-padding);
   }
 
   .navbar.scrolled {
     padding: 10px var(--page-padding);
   }
 
-  .navbar-center {
-    display: none;
-  }
-
-  .navbar-mobile-search {
-    display: flex;
-  }
-
-  .nav-text-link {
+  .navbar-links {
     display: none;
   }
 
   .navbar-right {
-    gap: 12px;
-  }
-
-  .logo-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
+    gap: 16px;
   }
 
   .logo {
-    font-size: 1.15rem;
+    font-size: 1.35rem;
   }
 
   .profile {
@@ -178,10 +154,10 @@
 /* ── Small Mobile ── */
 @media (max-width: 480px) {
   .logo {
-    font-size: 1.05rem;
+    font-size: 1.2rem;
   }
 
   .navbar-right {
-    gap: 10px;
+    gap: 14px;
   }
 }

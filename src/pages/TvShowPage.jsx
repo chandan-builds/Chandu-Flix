@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, Calendar, Play } from 'lucide-react';
+import { ArrowLeft, Star, Calendar, Play, HardDriveDownload } from 'lucide-react';
 import { fetchTvDetails, fetchTvSeason, TMDB_IMAGE } from '../tmdb';
 import { getProgress } from '../watchHistory';
 import VidKingPlayer from '../components/VidKingPlayer';
 import PeachifyPlayer from '../components/PeachifyPlayer';
 import VidsrcPlayer from '../components/VidsrcPlayer';
 import PlayerSelector from '../components/PlayerSelector';
+import DownloadButton from '../components/DownloadButton';
 import './TvShowPage.css';
 
 const TvShowPage = () => {
@@ -175,6 +176,13 @@ const TvShowPage = () => {
                 <Play size={20} fill="currentColor" />
                 {savedProgress > 0 ? 'Resume' : 'Play S1 E1'}
               </button>
+              <DownloadButton
+                mediaType="tv"
+                tmdbId={id}
+                season={selectedSeason}
+                episode={selectedEpisode}
+                title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
+              />
             </div>
           </div>
           <div className="tv-hero-fade" />
@@ -228,8 +236,20 @@ const TvShowPage = () => {
                   )}
                 </div>
                 <div className="episode-info">
-                  <span className="episode-number">E{ep.episode_number}</span>
-                  <span className="episode-name">{ep.name}</span>
+                  <div className="episode-info-header">
+                    <div>
+                      <span className="episode-number">E{ep.episode_number}</span>
+                      <span className="episode-name">{ep.name}</span>
+                    </div>
+                    <DownloadButton
+                      mediaType="tv"
+                      tmdbId={id}
+                      season={selectedSeason}
+                      episode={ep.episode_number}
+                      variant="icon"
+                      title={`${show.name} - S${selectedSeason}E${ep.episode_number}`}
+                    />
+                  </div>
                   {ep.overview && (
                     <p className="episode-desc">{ep.overview}</p>
                   )}
@@ -237,6 +257,25 @@ const TvShowPage = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* Download section for current episode */}
+        <div className="download-section" style={{ marginBottom: 32 }}>
+          <div className="download-section-icon">
+            <HardDriveDownload size={24} color="#fff" />
+          </div>
+          <div className="download-section-text">
+            <h4>Download S{selectedSeason} E{selectedEpisode}</h4>
+            <p>Multiple qualities available — 360p, 480p, 720p, 1080p</p>
+          </div>
+          <DownloadButton
+            mediaType="tv"
+            tmdbId={id}
+            season={selectedSeason}
+            episode={selectedEpisode}
+            label="Get Download Links"
+            title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
+          />
         </div>
 
         {/* Similar Shows */}

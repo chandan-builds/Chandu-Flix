@@ -33,7 +33,7 @@ const ContinueWatching = () => {
       <h2>Continue Watching</h2>
       <div className="cw-wrapper">
         <div className="slider-arrow left" onClick={() => handleScroll('left')}>
-          <ChevronLeft size={40} />
+          <ChevronLeft size={28} />
         </div>
 
         <div className="cw-posters" ref={rowRef}>
@@ -71,7 +71,7 @@ const ContinueWatching = () => {
         </div>
 
         <div className="slider-arrow right" onClick={() => handleScroll('right')}>
-          <ChevronRight size={40} />
+          <ChevronRight size={28} />
         </div>
       </div>
     </div>

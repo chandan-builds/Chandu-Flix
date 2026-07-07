@@ -1,20 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  /* Core Colors — CinePro-inspired */
-  --bg-primary: #09090b;
-  --bg-secondary: #111113;
-  --bg-elevated: #18181b;
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --accent-color: #dc2626;
-  --accent-hover: #ef4444;
-  
-  /* Glassmorphism */
-  --glass-bg: rgba(9, 9, 11, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.06);
-  --glass-light: rgba(255, 255, 255, 0.04);
+  /* Core Colors — Netflix-authentic palette */
+  --bg-primary: #141414;
+  --bg-secondary: #181818;
+  --bg-elevated: #232323;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-muted: #808080;
+  --accent-color: #e50914;
+  --accent-hover: #f40612;
+  --rating-green: #46d369;
+
+  /* Netflix "More Info" grey button */
+  --btn-grey: rgba(109, 109, 110, 0.7);
+  --btn-grey-hover: rgba(109, 109, 110, 0.4);
+
+  /* Surfaces */
+  --glass-bg: rgba(20, 20, 20, 0.92);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-light: rgba(255, 255, 255, 0.05);
 
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -29,12 +34,12 @@
 
   /* Spacing */
   --page-padding: 4%;
-  --section-gap: 2rem;
+  --section-gap: 2.2rem;
 
-  /* Radius */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  /* Radius — Netflix uses tight, mostly-square corners */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
   --radius-full: 9999px;
 }
 

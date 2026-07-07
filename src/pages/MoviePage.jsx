@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Play, ArrowLeft, Star, Clock, Calendar } from 'lucide-react';
+import { Play, ArrowLeft, Star, Clock, Calendar, HardDriveDownload } from 'lucide-react';
 import { fetchMovieDetails, TMDB_IMAGE } from '../tmdb';
 import { getProgress } from '../watchHistory';
 import VidKingPlayer from '../components/VidKingPlayer';
 import PeachifyPlayer from '../components/PeachifyPlayer';
 import VidsrcPlayer from '../components/VidsrcPlayer';
 import PlayerSelector from '../components/PlayerSelector';
+import DownloadButton from '../components/DownloadButton';
 import './MoviePage.css';
 
 const MoviePage = () => {
@@ -131,12 +132,25 @@ const MoviePage = () => {
                   <Play size={20} fill="currentColor" />
                   {savedProgress > 0 ? 'Resume' : 'Play'}
                 </button>
+                <DownloadButton mediaType="movie" tmdbId={id} title={movie.title} />
               </div>
             </div>
           </div>
           <div className="movie-hero-fade" />
         </div>
       )}
+
+      {/* Download section */}
+      <div className="download-section">
+        <div className="download-section-icon">
+          <HardDriveDownload size={24} color="#fff" />
+        </div>
+        <div className="download-section-text">
+          <h4>Download This Movie</h4>
+          <p>Multiple qualities available — 360p, 480p, 720p, 1080p, 4K</p>
+        </div>
+        <DownloadButton mediaType="movie" tmdbId={id} label="Get Download Links" title={movie.title} />
+      </div>
 
       {/* Details section */}
       <div className="movie-details-section">

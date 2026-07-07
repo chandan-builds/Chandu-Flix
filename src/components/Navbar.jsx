@@ -17,26 +17,21 @@ const Navbar = () => {
 
   return (
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
-      {/* Left: Logo */}
+      {/* Left: Logo + primary nav */}
       <div className="navbar-left">
         <Link to="/" className="logo-link">
-          <span className="logo-icon">C</span>
-          <h1 className="logo">Chandu-Flix</h1>
+          <h1 className="logo">CHANDUFLIX</h1>
         </Link>
-      </div>
-
-      {/* Center: Search Pill (desktop only) */}
-      <div className="navbar-center">
-        <SearchBar triggerMode="pill" />
-      </div>
-
-      {/* Right: Search Icon (mobile) + Profile */}
-      <div className="navbar-right">
-        <div className="navbar-mobile-search">
-          <SearchBar triggerMode="icon" />
+        <div className="navbar-links">
+          <Link to="/" className="nav-text-link">Home</Link>
+          <Link to="/search?type=tv" className="nav-text-link">TV Shows</Link>
+          <Link to="/search?type=movie" className="nav-text-link">Movies</Link>
         </div>
-        <Link to="/search?type=movie" className="nav-text-link">Movies</Link>
-        <Link to="/search?type=tv" className="nav-text-link">TV Shows</Link>
+      </div>
+
+      {/* Right: Search + Profile */}
+      <div className="navbar-right">
+        <SearchBar triggerMode="icon" />
         <div className="profile">
           <User size={18} />
         </div>

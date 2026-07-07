@@ -193,7 +193,7 @@ const SearchBar = ({ triggerMode = 'icon' }) => {
                         <span className="search-result-meta">
                           {rating > 0 && (
                             <>
-                              <Star size={12} fill="#dc2626" stroke="#dc2626" />
+                              <Star size={12} fill="#e50914" stroke="#e50914" />
                               <span>{rating.toFixed(1)}</span>
                             </>
                           )}
