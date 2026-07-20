@@ -202,90 +202,32 @@ const PiPPlayer = ({ children, isPlaying, iframeSrc, title }) => {
     const left = window.screen.width - width - 30;
     const top = window.screen.height - height - 100;
 
+    // Use 'popup=yes' to get a minimal chrome window (no tab bar, no bookmarks bar)
     const popupFeatures = [
       `width=${width}`,
       `height=${height}`,
       `left=${left}`,
       `top=${top}`,
-      'resizable=yes',
-      'scrollbars=no',
-      'toolbar=no',
-      'menubar=no',
-      'location=no',
-      'status=no',
+      'popup=yes',
     ].join(',');
 
-    // Build a minimal HTML page with the player iframe
+    // Build URL to pip.html with the player src as a query param
     const popupTitle = title || 'Chandu-Flix Player';
-    const popupHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${popupTitle.replace(/</g, '&lt;')} — PiP</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      width: 100%; height: 100%;
-      overflow: hidden;
-      background: #000;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      position: absolute;
-      top: 0; left: 0;
-    }
-    .loading {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      background: #000; color: #aaa; gap: 12px;
-      z-index: 5;
-    }
-    .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid rgba(229, 9, 20, 0.2);
-      border-top-color: #e50914;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    .loading p { font-size: 0.85rem; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-  </style>
-</head>
-<body>
-  <div class="loading" id="loader">
-    <div class="spinner"></div>
-    <p>Loading player…</p>
-  </div>
-  <iframe
-    src="${src.replace(/"/g, '&quot;')}"
-    allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-    allowfullscreen
-    referrerpolicy="origin"
-    onload="document.getElementById('loader').style.display='none'"
-  ></iframe>
-</body>
-</html>`;
+    const pipUrl = new URL('/pip.html', window.location.origin);
+    pipUrl.searchParams.set('src', src);
+    pipUrl.searchParams.set('title', popupTitle);
 
     // Close any existing popup
     if (popupWindowRef.current && !popupWindowRef.current.closed) {
       popupWindowRef.current.close();
     }
 
-    // Open popup with about:blank, then write HTML to it
-    const popup = window.open('about:blank', 'ChanduFlixPiP', popupFeatures);
+    // Open the pip.html page — shows clean URL, no about:blank
+    const popup = window.open(pipUrl.href, 'ChanduFlixPiP', popupFeatures);
     if (!popup) {
       alert('Popup blocked! Please allow popups for this site to use PiP.');
       return;
     }
-
-    popup.document.open();
-    popup.document.write(popupHTML);
-    popup.document.close();
 
     popupWindowRef.current = popup;
     setIsPopupPiP(true);
