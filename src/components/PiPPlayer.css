@@ -16,7 +16,9 @@
   width: 100%;
 }
 
-/* Floating PiP mode */
+/* ═══════════════════════════════════════════
+   Scroll-based Floating PiP (fallback)
+   ═══════════════════════════════════════════ */
 .pip-floating {
   position: fixed;
   bottom: 24px;
@@ -53,7 +55,7 @@
   }
 }
 
-/* ── Player Content inside PiP ── */
+/* ── Player Content inside Floating PiP ── */
 .pip-floating .pip-player-content {
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -76,13 +78,13 @@
   height: 100% !important;
 }
 
-/* Hide non-essential elements in PiP mode */
+/* Hide non-essential elements in floating PiP mode */
 .pip-floating .now-playing-info,
 .pip-floating .player-selector-container {
   display: none;
 }
 
-/* ── PiP Controls Overlay ── */
+/* ── Floating PiP Controls Overlay ── */
 .pip-controls {
   position: absolute;
   top: 0;
@@ -102,7 +104,6 @@
   opacity: 1;
 }
 
-/* On touch devices, always show controls */
 @media (hover: none) {
   .pip-controls {
     opacity: 1;
@@ -150,6 +151,10 @@
   background: rgba(229, 9, 20, 0.8);
 }
 
+.pip-native-btn:hover {
+  background: rgba(99, 102, 241, 0.7);
+}
+
 /* ── Glow ring on hover ── */
 .pip-floating::after {
   content: '';
@@ -165,7 +170,133 @@
   border-color: rgba(229, 9, 20, 0.4);
 }
 
-/* ── Responsive ── */
+/* ═══════════════════════════════════════════
+   Native Document PiP (cross-tab)
+   ═══════════════════════════════════════════ */
+
+/* When native PiP is active, the inline container shows a placeholder */
+.pip-native-active {
+  position: relative;
+  width: 100%;
+}
+
+.pip-native-placeholder-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  animation: pipPlaceholderPulse 3s ease-in-out infinite;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pip-native-placeholder-msg svg {
+  color: #e50914;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 8px rgba(229, 9, 20, 0.4));
+}
+
+.pip-native-placeholder-msg p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+}
+
+.pip-native-placeholder-msg span {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+}
+
+.pip-return-btn {
+  margin-top: 4px;
+  padding: 8px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.pip-return-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(229, 9, 20, 0.5);
+}
+
+@keyframes pipPlaceholderPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* ── Inline PiP Buttons (below the player) ── */
+.pip-inline-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 0 4px;
+}
+
+.pip-inline-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  backdrop-filter: blur(4px);
+}
+
+.pip-inline-btn:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.pip-inline-btn:active {
+  transform: translateY(0);
+}
+
+.pip-inline-btn svg {
+  flex-shrink: 0;
+}
+
+/* Secondary pop-out button (shown alongside PiP on Chromium) */
+.pip-inline-btn-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.pip-inline-btn-secondary:hover {
+  background: rgba(229, 9, 20, 0.12);
+  border-color: rgba(229, 9, 20, 0.35);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.15);
+}
+
+/* ═══════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════ */
 @media (max-width: 768px) {
   .pip-floating {
     width: 55vw;
@@ -182,6 +313,27 @@
 
   .pip-controls {
     padding: 4px 6px;
+  }
+
+  .pip-native-placeholder-msg {
+    aspect-ratio: 16 / 9;
+    border-radius: 0;
+  }
+
+  .pip-native-placeholder-msg p {
+    font-size: 0.95rem;
+  }
+
+  .pip-native-placeholder-msg span {
+    font-size: 0.75rem;
+  }
+
+  .pip-inline-btn span {
+    display: none;
+  }
+
+  .pip-inline-btn {
+    padding: 6px 10px;
   }
 }
 
