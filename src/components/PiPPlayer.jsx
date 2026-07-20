@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Maximize2, GripHorizontal, PictureInPicture2, ExternalLink } from 'lucide-react';
+import { X, Maximize2, GripHorizontal, PictureInPicture2 } from 'lucide-react';
 import './PiPPlayer.css';
 
 /**
@@ -462,43 +462,20 @@ const PiPPlayer = ({ children, isPlaying, iframeSrc, title }) => {
         )}
       </div>
 
-      {/* Inline PiP buttons (below the player, always visible) */}
+      {/* Inline PiP button (below the player) */}
       {!showPiP && !isExternalPiP && (
         <div className="pip-inline-controls">
-          {supportsDocPiP ? (
-            <button
-              className="pip-inline-btn"
-              onClick={enterNativePiP}
-              title="Always-on-top PiP window (stays across all apps)"
-              aria-label="Enter picture-in-picture mode"
-            >
-              <PictureInPicture2 size={16} />
-              <span>PiP</span>
-            </button>
-          ) : (
-            <button
-              className="pip-inline-btn"
-              onClick={enterPopupPiP}
-              title="Open in popup window (stays across tabs & apps)"
-              aria-label="Open player in popup window"
-            >
-              <ExternalLink size={16} />
-              <span>Pop Out</span>
-            </button>
-          )}
-
-          {/* Always show popup option as a secondary choice on Chromium too */}
-          {supportsDocPiP && (
-            <button
-              className="pip-inline-btn pip-inline-btn-secondary"
-              onClick={enterPopupPiP}
-              title="Open in popup window (works in all browsers)"
-              aria-label="Open player in popup window"
-            >
-              <ExternalLink size={16} />
-              <span>Pop Out</span>
-            </button>
-          )}
+          <button
+            className="pip-inline-btn"
+            onClick={supportsDocPiP ? enterNativePiP : enterPopupPiP}
+            title={supportsDocPiP
+              ? 'Borderless PiP — floats on top of all apps'
+              : 'Open in popup window (stays across tabs & apps)'}
+            aria-label="Enter picture-in-picture mode"
+          >
+            <PictureInPicture2 size={16} />
+            <span>PiP</span>
+          </button>
         </div>
       )}
     </>
