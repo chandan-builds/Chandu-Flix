@@ -35,7 +35,6 @@ const PiPPlayer = ({ children, isPlaying, iframeSrc, title }) => {
   const pipRef = useRef(null);
   const playerContentRef = useRef(null);
   const pipWindowRef = useRef(null);
-  const placeholderRef = useRef(null);
   const popupWindowRef = useRef(null);
   const popupCheckInterval = useRef(null);
 
@@ -71,6 +70,14 @@ const PiPPlayer = ({ children, isPlaying, iframeSrc, title }) => {
   const enterNativePiP = useCallback(async () => {
     if (!supportsDocPiP || !playerContentRef.current) return;
 
+    // Grab the iframe src from the currently rendered player
+    let src = iframeSrc;
+    if (!src) {
+      const iframe = playerContentRef.current.querySelector('iframe');
+      if (iframe) src = iframe.src;
+    }
+    if (!src) return;
+
     try {
       const pipWindow = await window.documentPictureInPicture.requestWindow({
         width: 480,
@@ -79,27 +86,7 @@ const PiPPlayer = ({ children, isPlaying, iframeSrc, title }) => {
 
       pipWindowRef.current = pipWindow;
 
-      // Copy stylesheets
-      [...document.styleSheets].forEach((sheet) => {
-        try {
-          if (sheet.href) {
-            const link = pipWindow.document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = sheet.href;
-            pipWindow.document.head.appendChild(link);
-          } else if (sheet.cssRules) {
-            const style = pipWindow.document.createElement('style');
-            [...sheet.cssRules].forEach((rule) => {
-              style.appendChild(pipWindow.document.createTextNode(rule.cssText));
-            });
-            pipWindow.document.head.appendChild(style);
-          }
-        } catch {
-          // Skip cross-origin stylesheets
-        }
-      });
-
-      // PiP window styles
+      // Minimal styles for the PiP window — just fullscreen iframe
       const pipStyles = pipWindow.document.createElement('style');
       pipStyles.textContent = `
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -107,37 +94,21 @@ const PiPPlayer = ({ children, isPlaying, iframeSrc, title }) => {
           width: 100%; height: 100%;
           overflow: hidden;
           background: #000;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        .pip-native-wrapper {
+        iframe {
           width: 100%; height: 100%;
-          position: relative;
-          background: #000;
+          border: none;
+          position: absolute;
+          top: 0; left: 0;
         }
-        .pip-native-wrapper .peachify-player-wrapper,
-        .pip-native-wrapper .vidking-player-wrapper {
-          padding-bottom: 0 !important;
-          height: 100% !important;
-          width: 100% !important;
-          border-radius: 0 !important;
-          box-shadow: none !important;
-        }
-        .pip-native-wrapper iframe {
-          width: 100% !important;
-          height: 100% !important;
-          border: none !important;
-          position: absolute !important;
-          top: 0 !important;
-          left: 0 !important;
-        }
-        .pip-native-wrapper .player-loading-overlay {
+        .pip-loader {
           position: absolute; inset: 0;
           display: flex; align-items: center; justify-content: center;
           background: #000; z-index: 5;
         }
-        .pip-native-wrapper .spinner {
-          width: 40px; height: 40px;
-          border: 4px solid rgba(229, 9, 20, 0.2);
+        .pip-spinner {
+          width: 36px; height: 36px;
+          border: 3px solid rgba(229, 9, 20, 0.2);
           border-top-color: #e50914;
           border-radius: 50%;
           animation: spin 1s linear infinite;
@@ -146,37 +117,33 @@ const PiPPlayer = ({ children, isPlaying, iframeSrc, title }) => {
       `;
       pipWindow.document.head.appendChild(pipStyles);
 
-      // Placeholder in main page
-      const placeholder = document.createElement('div');
-      placeholder.className = 'pip-native-placeholder';
-      placeholderRef.current = placeholder;
-      playerContentRef.current.parentNode.insertBefore(placeholder, playerContentRef.current);
+      // Add a loading spinner
+      const loader = pipWindow.document.createElement('div');
+      loader.className = 'pip-loader';
+      loader.innerHTML = '<div class="pip-spinner"></div>';
+      pipWindow.document.body.appendChild(loader);
 
-      // Move player DOM into PiP window
-      const wrapper = pipWindow.document.createElement('div');
-      wrapper.className = 'pip-native-wrapper';
-      pipWindow.document.body.appendChild(wrapper);
-      wrapper.appendChild(playerContentRef.current);
+      // Create a fresh iframe in the PiP window (don't move DOM — that breaks cross-origin iframes)
+      const pipIframe = pipWindow.document.createElement('iframe');
+      pipIframe.src = src;
+      pipIframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      pipIframe.allowFullscreen = true;
+      pipIframe.referrerPolicy = 'origin';
+      pipIframe.onload = () => { loader.style.display = 'none'; };
+      pipWindow.document.body.appendChild(pipIframe);
 
       setIsNativePiP(true);
       setIsPiP(false);
 
+      // When the PiP window closes, restore state
       pipWindow.addEventListener('pagehide', () => {
-        if (placeholderRef.current && playerContentRef.current) {
-          placeholderRef.current.parentNode.insertBefore(
-            playerContentRef.current,
-            placeholderRef.current
-          );
-          placeholderRef.current.remove();
-          placeholderRef.current = null;
-        }
         pipWindowRef.current = null;
         setIsNativePiP(false);
       });
     } catch (err) {
       console.warn('Document PiP failed:', err);
     }
-  }, [supportsDocPiP]);
+  }, [supportsDocPiP, iframeSrc]);
 
   const exitNativePiP = useCallback(() => {
     if (pipWindowRef.current) {
@@ -260,20 +227,10 @@ const PiPPlayer = ({ children, isPlaying, iframeSrc, title }) => {
   // Clean up on unmount
   useEffect(() => {
     return () => {
-      // Clean up Document PiP
       if (pipWindowRef.current) {
-        if (placeholderRef.current && playerContentRef.current) {
-          placeholderRef.current.parentNode?.insertBefore(
-            playerContentRef.current,
-            placeholderRef.current
-          );
-          placeholderRef.current.remove();
-        }
         pipWindowRef.current.close();
         pipWindowRef.current = null;
-        placeholderRef.current = null;
       }
-      // Clean up Popup PiP
       if (popupWindowRef.current && !popupWindowRef.current.closed) {
         popupWindowRef.current.close();
       }
