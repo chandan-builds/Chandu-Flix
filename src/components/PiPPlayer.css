@@ -1,0 +1,196 @@
+/* ── PiP Sentinel ── */
+.pip-sentinel {
+  width: 100%;
+  height: 1px;
+  pointer-events: none;
+}
+
+/* ── PiP Container ── */
+.pip-container {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Inline mode: normal flow */
+.pip-inline {
+  position: relative;
+  width: 100%;
+}
+
+/* Floating PiP mode */
+.pip-floating {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 400px;
+  z-index: 9999;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 30px rgba(229, 9, 20, 0.15);
+  animation: pipSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  cursor: grab;
+}
+
+.pip-floating.pip-dragging {
+  cursor: grabbing;
+  transition: none;
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0 40px rgba(229, 9, 20, 0.25);
+}
+
+@keyframes pipSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Player Content inside PiP ── */
+.pip-floating .pip-player-content {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Force iframe players to fill the PiP box */
+.pip-floating .pip-player-content .peachify-player-wrapper,
+.pip-floating .pip-player-content .vidking-player-wrapper {
+  padding-bottom: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.pip-floating .pip-player-content iframe {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Hide non-essential elements in PiP mode */
+.pip-floating .now-playing-info,
+.pip-floating .player-selector-container {
+  display: none;
+}
+
+/* ── PiP Controls Overlay ── */
+.pip-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, transparent 100%);
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.pip-floating:hover .pip-controls {
+  opacity: 1;
+}
+
+/* On touch devices, always show controls */
+@media (hover: none) {
+  .pip-controls {
+    opacity: 1;
+  }
+}
+
+.pip-drag-handle {
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+.pip-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pip-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(4px);
+}
+
+.pip-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+.pip-btn:active {
+  transform: scale(0.95);
+}
+
+.pip-close-btn:hover {
+  background: rgba(229, 9, 20, 0.8);
+}
+
+/* ── Glow ring on hover ── */
+.pip-floating::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+  pointer-events: none;
+}
+
+.pip-floating:hover::after {
+  border-color: rgba(229, 9, 20, 0.4);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .pip-floating {
+    width: 55vw;
+    min-width: 220px;
+    bottom: 16px;
+    right: 12px;
+    border-radius: 10px;
+  }
+
+  .pip-btn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .pip-controls {
+    padding: 4px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pip-floating {
+    width: 60vw;
+    min-width: 200px;
+    bottom: 12px;
+    right: 8px;
+    border-radius: 8px;
+  }
+}

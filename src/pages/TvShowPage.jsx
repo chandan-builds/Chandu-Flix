@@ -8,6 +8,7 @@ import PeachifyPlayer from '../components/PeachifyPlayer';
 import VidsrcPlayer from '../components/VidsrcPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import DownloadButton from '../components/DownloadButton';
+import PiPPlayer from '../components/PiPPlayer';
 import './TvShowPage.css';
 
 const TvShowPage = () => {
@@ -103,37 +104,39 @@ const TvShowPage = () => {
       {/* Player or Hero */}
       {isPlaying ? (
         <div className="player-section">
-          {activePlayer === 'peachify' ? (
-            <PeachifyPlayer
-              mediaType="tv"
-              tmdbId={id}
-              season={selectedSeason}
-              episode={selectedEpisode}
-              progress={savedProgress}
-              title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
-              poster_path={show.poster_path}
-              backdrop_path={currentEpisode?.still_path || show.backdrop_path}
-            />
-          ) : activePlayer === 'vidking' ? (
-            <VidKingPlayer
-              mediaType="tv"
-              tmdbId={id}
-              season={selectedSeason}
-              episode={selectedEpisode}
-              progress={savedProgress}
-              title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
-              poster_path={show.poster_path}
-              backdrop_path={currentEpisode?.still_path || show.backdrop_path}
-            />
-          ) : (
-            <VidsrcPlayer
-              mediaType="tv"
-              tmdbId={id}
-              season={selectedSeason}
-              episode={selectedEpisode}
-              title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
-            />
-          )}
+          <PiPPlayer isPlaying={isPlaying}>
+            {activePlayer === 'peachify' ? (
+              <PeachifyPlayer
+                mediaType="tv"
+                tmdbId={id}
+                season={selectedSeason}
+                episode={selectedEpisode}
+                progress={savedProgress}
+                title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
+                poster_path={show.poster_path}
+                backdrop_path={currentEpisode?.still_path || show.backdrop_path}
+              />
+            ) : activePlayer === 'vidking' ? (
+              <VidKingPlayer
+                mediaType="tv"
+                tmdbId={id}
+                season={selectedSeason}
+                episode={selectedEpisode}
+                progress={savedProgress}
+                title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
+                poster_path={show.poster_path}
+                backdrop_path={currentEpisode?.still_path || show.backdrop_path}
+              />
+            ) : (
+              <VidsrcPlayer
+                mediaType="tv"
+                tmdbId={id}
+                season={selectedSeason}
+                episode={selectedEpisode}
+                title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
+              />
+            )}
+          </PiPPlayer>
           <div className="now-playing-info">
             <h3>
               S{selectedSeason} E{selectedEpisode}

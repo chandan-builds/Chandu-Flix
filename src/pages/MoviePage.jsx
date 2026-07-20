@@ -8,6 +8,7 @@ import PeachifyPlayer from '../components/PeachifyPlayer';
 import VidsrcPlayer from '../components/VidsrcPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import DownloadButton from '../components/DownloadButton';
+import PiPPlayer from '../components/PiPPlayer';
 import './MoviePage.css';
 
 const MoviePage = () => {
@@ -67,31 +68,33 @@ const MoviePage = () => {
       {/* Player or Hero */}
       {isPlaying ? (
         <div className="player-section">
-          {activePlayer === 'peachify' ? (
-            <PeachifyPlayer
-              mediaType="movie"
-              tmdbId={id}
-              progress={savedProgress}
-              title={movie.title}
-              poster_path={movie.poster_path}
-              backdrop_path={movie.backdrop_path}
-            />
-          ) : activePlayer === 'vidking' ? (
-            <VidKingPlayer
-              mediaType="movie"
-              tmdbId={id}
-              progress={savedProgress}
-              title={movie.title}
-              poster_path={movie.poster_path}
-              backdrop_path={movie.backdrop_path}
-            />
-          ) : (
-            <VidsrcPlayer
-              mediaType="movie"
-              tmdbId={id}
-              title={movie.title}
-            />
-          )}
+          <PiPPlayer isPlaying={isPlaying}>
+            {activePlayer === 'peachify' ? (
+              <PeachifyPlayer
+                mediaType="movie"
+                tmdbId={id}
+                progress={savedProgress}
+                title={movie.title}
+                poster_path={movie.poster_path}
+                backdrop_path={movie.backdrop_path}
+              />
+            ) : activePlayer === 'vidking' ? (
+              <VidKingPlayer
+                mediaType="movie"
+                tmdbId={id}
+                progress={savedProgress}
+                title={movie.title}
+                poster_path={movie.poster_path}
+                backdrop_path={movie.backdrop_path}
+              />
+            ) : (
+              <VidsrcPlayer
+                mediaType="movie"
+                tmdbId={id}
+                title={movie.title}
+              />
+            )}
+          </PiPPlayer>
           <PlayerSelector onPlayerChange={setActivePlayer} />
         </div>
       ) : (
