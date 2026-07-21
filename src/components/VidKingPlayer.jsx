@@ -49,6 +49,7 @@ const VidKingPlayer = ({
         className="vidking-iframe"
         allowFullScreen
         allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
         referrerPolicy="origin"
       />
     </div>

@@ -50,6 +50,12 @@ const PiPPlayer = ({ children, isPlaying, iframeSrc, title }) => {
   useEffect(() => {
     if (!isPlaying || isDismissed || isNativePiP || isPopupPiP) return;
 
+    // Disable scroll-based floating PiP on mobile screens
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      setIsPiP(false);
+      return;
+    }
+
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
 
@@ -349,6 +355,11 @@ const PiPPlayer = ({ children, isPlaying, iframeSrc, title }) => {
     <>
       {/* Sentinel: stays in flow to detect scroll position */}
       <div ref={sentinelRef} className="pip-sentinel" />
+
+      {/* Layout placeholder: prevents collapse of page content when player floats */}
+      {showPiP && (
+        <div className="pip-placeholder" style={{ width: '100%', aspectRatio: '16/9' }} />
+      )}
 
       {/* Player container: inline or floating */}
       <div

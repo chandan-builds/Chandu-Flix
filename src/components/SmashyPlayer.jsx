@@ -21,6 +21,7 @@ const SmashyPlayer = ({ mediaType = 'movie', tmdbId, season = 1, episode = 1, ti
         style={{ width: '100%', height: '100%', border: 'none' }}
         allowFullScreen
         allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
         referrerPolicy="origin"
         onLoad={() => setLoading(false)}
       />

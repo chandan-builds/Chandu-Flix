@@ -1,0 +1,134 @@
+.moviebox-player-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.moviebox-artplayer {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Loader ── */
+.moviebox-loader {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #05070a;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-heading);
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.moviebox-spinner {
+  color: #e50914;
+  animation: spin 1.2s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(229, 9, 20, 0.4));
+}
+
+.moviebox-loader p {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ── Error state ── */
+.moviebox-error-card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0d0607 0%, #170d0e 100%);
+  color: #fff;
+  font-family: var(--font-heading);
+  gap: 12px;
+  padding: 32px;
+  text-align: center;
+  border-radius: 8px;
+  border: 1px solid rgba(229, 9, 20, 0.15);
+}
+
+.moviebox-error-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ff6b64;
+}
+
+.moviebox-error-card p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 320px;
+}
+
+.error-actions {
+  margin-top: 8px;
+}
+
+.fallback-btn {
+  background: linear-gradient(135deg, #e50914, #b2070f);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(229, 9, 20, 0.3);
+  transition: all 0.2s;
+  outline: none;
+  font-family: inherit;
+}
+
+.fallback-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(229, 9, 20, 0.45);
+}
+
+.fallback-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Artplayer customization ── */
+.artplayer-container {
+  border-radius: 8px;
+}
+
+.art-control-subtitle {
+  font-family: inherit !important;
+}
+
+.art-subtitle {
+  padding: 4px 12px !important;
+  background: rgba(0, 0, 0, 0.65) !important;
+  border-radius: 6px !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+@media (max-width: 768px) {
+  .moviebox-loader p {
+    font-size: 13px;
+  }
+  .moviebox-error-card h3 {
+    font-size: 16px;
+  }
+  .moviebox-error-card p {
+    font-size: 12px;
+  }
+  .fallback-btn {
+    padding: 8px 20px;
+    font-size: 12px;
+  }
+}

@@ -11,12 +11,16 @@ import SuperEmbedPlayer from '../components/SuperEmbedPlayer';
 import TwoEmbedPlayer from '../components/TwoEmbedPlayer';
 import NontonGoPlayer from '../components/NontonGoPlayer';
 import SmashyPlayer from '../components/SmashyPlayer';
+import MovieBoxPlayer from '../components/MovieBoxPlayer';
+import VidLinkPlayer from '../components/VidLinkPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import DownloadButton from '../components/DownloadButton';
 import PiPPlayer from '../components/PiPPlayer';
 import './TvShowPage.css';
 
 const PLAYER_MAP = {
+  vidlink: VidLinkPlayer,
+  moviebox: MovieBoxPlayer,
   peachify: PeachifyPlayer,
   vidking: VidKingPlayer,
   vidsrc: VidsrcPlayer,
@@ -36,7 +40,9 @@ const TvShowPage = () => {
   const [seasonData, setSeasonData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [activePlayer, setActivePlayer] = useState('peachify');
+  const [activePlayer, setActivePlayer] = useState(() => {
+    return localStorage.getItem('preferred_player') || 'vidlink';
+  });
 
   const selectedSeason = parseInt(searchParams.get('season')) || 1;
   const selectedEpisode = parseInt(searchParams.get('episode')) || 1;
@@ -111,8 +117,9 @@ const TvShowPage = () => {
   const similar = show.similar?.results?.slice(0, 12) || [];
 
   // Resolve the active player component
-  const ActivePlayerComponent = PLAYER_MAP[activePlayer] || PeachifyPlayer;
+  const ActivePlayerComponent = PLAYER_MAP[activePlayer] || MovieBoxPlayer;
   const needsWatchHistoryProps = ['peachify', 'vidking'].includes(activePlayer);
+  const isMovieBox = activePlayer === 'moviebox';
 
   return (
     <div className="tv-page">
@@ -130,6 +137,10 @@ const TvShowPage = () => {
               tmdbId={id}
               season={selectedSeason}
               episode={selectedEpisode}
+              {...(isMovieBox ? {
+                year: year,
+                onFallback: () => setActivePlayer('peachify'),
+              } : {})}
               {...(needsWatchHistoryProps ? {
                 progress: savedProgress,
                 title: `${show.name} - S${selectedSeason}E${selectedEpisode}`,

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import './PlayerSelector.css';
 
 const SERVERS = [
+  { id: 'vidlink', name: 'VidLink', tag: '⚡ Native', tier: 'primary' },
+  { id: 'moviebox', name: 'MovieBox', tag: 'Native Alt', tier: 'primary' },
   { id: 'peachify', name: 'Peachify', tag: '🔥 Best', tier: 'primary' },
   { id: 'autoembed', name: 'AutoEmbed', tag: 'HD', tier: 'primary' },
   { id: 'superembed', name: 'SuperEmbed', tag: 'Multi', tier: 'primary' },
@@ -14,7 +16,7 @@ const SERVERS = [
 
 const PlayerSelector = ({ onPlayerChange }) => {
   const [selectedPlayer, setSelectedPlayer] = useState(() => {
-    return localStorage.getItem('preferred_player') || 'peachify';
+    return localStorage.getItem('preferred_player') || 'vidlink';
   });
 
   useEffect(() => {

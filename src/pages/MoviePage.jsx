@@ -11,12 +11,16 @@ import SuperEmbedPlayer from '../components/SuperEmbedPlayer';
 import TwoEmbedPlayer from '../components/TwoEmbedPlayer';
 import NontonGoPlayer from '../components/NontonGoPlayer';
 import SmashyPlayer from '../components/SmashyPlayer';
+import MovieBoxPlayer from '../components/MovieBoxPlayer';
+import VidLinkPlayer from '../components/VidLinkPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import DownloadButton from '../components/DownloadButton';
 import PiPPlayer from '../components/PiPPlayer';
 import './MoviePage.css';
 
 const PLAYER_MAP = {
+  vidlink: VidLinkPlayer,
+  moviebox: MovieBoxPlayer,
   peachify: PeachifyPlayer,
   vidking: VidKingPlayer,
   vidsrc: VidsrcPlayer,
@@ -32,7 +36,9 @@ const MoviePage = () => {
   const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [activePlayer, setActivePlayer] = useState('peachify');
+  const [activePlayer, setActivePlayer] = useState(() => {
+    return localStorage.getItem('preferred_player') || 'vidlink';
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -75,8 +81,9 @@ const MoviePage = () => {
   const similar = movie.similar?.results?.slice(0, 12) || [];
 
   // Resolve the active player component
-  const ActivePlayerComponent = PLAYER_MAP[activePlayer] || PeachifyPlayer;
+  const ActivePlayerComponent = PLAYER_MAP[activePlayer] || MovieBoxPlayer;
   const needsWatchHistoryProps = ['peachify', 'vidking'].includes(activePlayer);
+  const isMovieBox = activePlayer === 'moviebox';
 
   return (
     <div className="movie-page">
@@ -92,6 +99,10 @@ const MoviePage = () => {
             <ActivePlayerComponent
               mediaType="movie"
               tmdbId={id}
+              {...(isMovieBox ? {
+                year: year,
+                onFallback: () => setActivePlayer('peachify'),
+              } : {})}
               {...(needsWatchHistoryProps ? {
                 progress: savedProgress,
                 title: movie.title,

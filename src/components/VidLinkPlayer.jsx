@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
-const AutoEmbedPlayer = ({ mediaType = 'movie', tmdbId, season = 1, episode = 1, title }) => {
+const VidLinkPlayer = ({ mediaType = 'movie', tmdbId, season = 1, episode = 1, title }) => {
   const [loading, setLoading] = useState(true);
 
+  // Build the VidLink URL with customized color matching Chandu-Flix theme
   const src = mediaType === 'tv'
-    ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${episode}`
-    : `https://player.autoembed.cc/embed/movie/${tmdbId}`;
+    ? `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=e50914&secondaryColor=111318`
+    : `https://vidlink.pro/movie/${tmdbId}?primaryColor=e50914&secondaryColor=111318`;
 
   return (
     <div className="peachify-player-wrapper" style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -29,4 +30,4 @@ const AutoEmbedPlayer = ({ mediaType = 'movie', tmdbId, season = 1, episode = 1,
   );
 };
 
-export default AutoEmbedPlayer;
+export default VidLinkPlayer;
