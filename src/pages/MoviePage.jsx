@@ -15,7 +15,6 @@ import MovieBoxPlayer from '../components/MovieBoxPlayer';
 import VidLinkPlayer from '../components/VidLinkPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import DownloadButton from '../components/DownloadButton';
-import PiPPlayer from '../components/PiPPlayer';
 import './MoviePage.css';
 
 const PLAYER_MAP = {
@@ -95,7 +94,6 @@ const MoviePage = () => {
       {/* Player or Hero */}
       {isPlaying ? (
         <div className="player-section">
-          <PiPPlayer isPlaying={isPlaying}>
             <ActivePlayerComponent
               mediaType="movie"
               tmdbId={id}
@@ -112,7 +110,6 @@ const MoviePage = () => {
                 title: movie.title,
               })}
             />
-          </PiPPlayer>
           <PlayerSelector onPlayerChange={setActivePlayer} />
         </div>
       ) : (

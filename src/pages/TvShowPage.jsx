@@ -15,7 +15,6 @@ import MovieBoxPlayer from '../components/MovieBoxPlayer';
 import VidLinkPlayer from '../components/VidLinkPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import DownloadButton from '../components/DownloadButton';
-import PiPPlayer from '../components/PiPPlayer';
 import './TvShowPage.css';
 
 const PLAYER_MAP = {
@@ -131,7 +130,6 @@ const TvShowPage = () => {
       {/* Player or Hero */}
       {isPlaying ? (
         <div className="player-section">
-          <PiPPlayer isPlaying={isPlaying}>
             <ActivePlayerComponent
               mediaType="tv"
               tmdbId={id}
@@ -150,7 +148,6 @@ const TvShowPage = () => {
                 title: `${show.name} - S${selectedSeason}E${selectedEpisode}`,
               })}
             />
-          </PiPPlayer>
           <div className="now-playing-info">
             <h3>
               S{selectedSeason} E{selectedEpisode}

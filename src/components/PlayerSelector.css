@@ -1,6 +1,4 @@
 .server-selector {
-  position: relative;
-  z-index: 10001;
   margin: 16px 0;
   padding: 16px 20px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
