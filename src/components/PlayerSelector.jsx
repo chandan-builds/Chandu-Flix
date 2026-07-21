@@ -3,11 +3,9 @@ import './PlayerSelector.css';
 
 const SERVERS = [
   { id: 'vidlink', name: 'VidLink', tag: '⚡ Native', tier: 'primary' },
-  { id: 'moviebox', name: 'MovieBox', tag: 'Native Alt', tier: 'primary' },
   { id: 'peachify', name: 'Peachify', tag: '🔥 Best', tier: 'primary' },
-  { id: 'autoembed', name: 'AutoEmbed', tag: 'HD', tier: 'primary' },
-  { id: 'superembed', name: 'SuperEmbed', tag: 'Multi', tier: 'primary' },
   { id: 'vidking', name: 'VidKing', tag: 'Fast', tier: 'primary' },
+  { id: 'moviebox', name: 'MovieBox', tag: 'Native Alt', tier: 'primary' },
   { id: 'vidsrc', name: 'VidSrc', tag: 'Clean', tier: 'secondary' },
   { id: 'twoembed', name: '2Embed', tag: 'Alt', tier: 'secondary' },
   { id: 'nontongo', name: 'NontonGo', tag: 'Alt', tier: 'secondary' },
