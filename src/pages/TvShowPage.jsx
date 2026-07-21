@@ -6,10 +6,26 @@ import { getProgress } from '../watchHistory';
 import VidKingPlayer from '../components/VidKingPlayer';
 import PeachifyPlayer from '../components/PeachifyPlayer';
 import VidsrcPlayer from '../components/VidsrcPlayer';
+import AutoEmbedPlayer from '../components/AutoEmbedPlayer';
+import SuperEmbedPlayer from '../components/SuperEmbedPlayer';
+import TwoEmbedPlayer from '../components/TwoEmbedPlayer';
+import NontonGoPlayer from '../components/NontonGoPlayer';
+import SmashyPlayer from '../components/SmashyPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import DownloadButton from '../components/DownloadButton';
 import PiPPlayer from '../components/PiPPlayer';
 import './TvShowPage.css';
+
+const PLAYER_MAP = {
+  peachify: PeachifyPlayer,
+  vidking: VidKingPlayer,
+  vidsrc: VidsrcPlayer,
+  autoembed: AutoEmbedPlayer,
+  superembed: SuperEmbedPlayer,
+  twoembed: TwoEmbedPlayer,
+  nontongo: NontonGoPlayer,
+  smashy: SmashyPlayer,
+};
 
 const TvShowPage = () => {
   const { id } = useParams();
@@ -94,6 +110,10 @@ const TvShowPage = () => {
   const genres = show.genres?.map((g) => g.name).join(', ');
   const similar = show.similar?.results?.slice(0, 12) || [];
 
+  // Resolve the active player component
+  const ActivePlayerComponent = PLAYER_MAP[activePlayer] || PeachifyPlayer;
+  const needsWatchHistoryProps = ['peachify', 'vidking'].includes(activePlayer);
+
   return (
     <div className="tv-page">
       {/* Back button */}
@@ -105,37 +125,20 @@ const TvShowPage = () => {
       {isPlaying ? (
         <div className="player-section">
           <PiPPlayer isPlaying={isPlaying}>
-            {activePlayer === 'peachify' ? (
-              <PeachifyPlayer
-                mediaType="tv"
-                tmdbId={id}
-                season={selectedSeason}
-                episode={selectedEpisode}
-                progress={savedProgress}
-                title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
-                poster_path={show.poster_path}
-                backdrop_path={currentEpisode?.still_path || show.backdrop_path}
-              />
-            ) : activePlayer === 'vidking' ? (
-              <VidKingPlayer
-                mediaType="tv"
-                tmdbId={id}
-                season={selectedSeason}
-                episode={selectedEpisode}
-                progress={savedProgress}
-                title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
-                poster_path={show.poster_path}
-                backdrop_path={currentEpisode?.still_path || show.backdrop_path}
-              />
-            ) : (
-              <VidsrcPlayer
-                mediaType="tv"
-                tmdbId={id}
-                season={selectedSeason}
-                episode={selectedEpisode}
-                title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
-              />
-            )}
+            <ActivePlayerComponent
+              mediaType="tv"
+              tmdbId={id}
+              season={selectedSeason}
+              episode={selectedEpisode}
+              {...(needsWatchHistoryProps ? {
+                progress: savedProgress,
+                title: `${show.name} - S${selectedSeason}E${selectedEpisode}`,
+                poster_path: show.poster_path,
+                backdrop_path: currentEpisode?.still_path || show.backdrop_path,
+              } : {
+                title: `${show.name} - S${selectedSeason}E${selectedEpisode}`,
+              })}
+            />
           </PiPPlayer>
           <div className="now-playing-info">
             <h3>

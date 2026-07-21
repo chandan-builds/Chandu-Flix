@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { User } from 'lucide-react';
 import SearchBar from './SearchBar';
 import './Navbar.css';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +16,8 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const isActive = (path) => location.pathname === path;
+
   return (
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       {/* Left: Logo + primary nav */}
@@ -23,9 +26,10 @@ const Navbar = () => {
           <h1 className="logo">CHANDUFLIX</h1>
         </Link>
         <div className="navbar-links">
-          <Link to="/" className="nav-text-link">Home</Link>
-          <Link to="/search?type=tv" className="nav-text-link">TV Shows</Link>
-          <Link to="/search?type=movie" className="nav-text-link">Movies</Link>
+          <Link to="/" className={`nav-text-link ${isActive('/') ? 'active' : ''}`}>Home</Link>
+          <Link to="/movies" className={`nav-text-link ${isActive('/movies') ? 'active' : ''}`}>Movies</Link>
+          <Link to="/tv-shows" className={`nav-text-link ${isActive('/tv-shows') ? 'active' : ''}`}>TV Shows</Link>
+          <Link to="/search" className={`nav-text-link ${isActive('/search') ? 'active' : ''}`}>Search</Link>
         </div>
       </div>
 

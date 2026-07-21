@@ -6,10 +6,26 @@ import { getProgress } from '../watchHistory';
 import VidKingPlayer from '../components/VidKingPlayer';
 import PeachifyPlayer from '../components/PeachifyPlayer';
 import VidsrcPlayer from '../components/VidsrcPlayer';
+import AutoEmbedPlayer from '../components/AutoEmbedPlayer';
+import SuperEmbedPlayer from '../components/SuperEmbedPlayer';
+import TwoEmbedPlayer from '../components/TwoEmbedPlayer';
+import NontonGoPlayer from '../components/NontonGoPlayer';
+import SmashyPlayer from '../components/SmashyPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import DownloadButton from '../components/DownloadButton';
 import PiPPlayer from '../components/PiPPlayer';
 import './MoviePage.css';
+
+const PLAYER_MAP = {
+  peachify: PeachifyPlayer,
+  vidking: VidKingPlayer,
+  vidsrc: VidsrcPlayer,
+  autoembed: AutoEmbedPlayer,
+  superembed: SuperEmbedPlayer,
+  twoembed: TwoEmbedPlayer,
+  nontongo: NontonGoPlayer,
+  smashy: SmashyPlayer,
+};
 
 const MoviePage = () => {
   const { id } = useParams();
@@ -58,6 +74,10 @@ const MoviePage = () => {
   const cast = movie.credits?.cast?.slice(0, 8) || [];
   const similar = movie.similar?.results?.slice(0, 12) || [];
 
+  // Resolve the active player component
+  const ActivePlayerComponent = PLAYER_MAP[activePlayer] || PeachifyPlayer;
+  const needsWatchHistoryProps = ['peachify', 'vidking'].includes(activePlayer);
+
   return (
     <div className="movie-page">
       {/* Back button */}
@@ -69,31 +89,18 @@ const MoviePage = () => {
       {isPlaying ? (
         <div className="player-section">
           <PiPPlayer isPlaying={isPlaying}>
-            {activePlayer === 'peachify' ? (
-              <PeachifyPlayer
-                mediaType="movie"
-                tmdbId={id}
-                progress={savedProgress}
-                title={movie.title}
-                poster_path={movie.poster_path}
-                backdrop_path={movie.backdrop_path}
-              />
-            ) : activePlayer === 'vidking' ? (
-              <VidKingPlayer
-                mediaType="movie"
-                tmdbId={id}
-                progress={savedProgress}
-                title={movie.title}
-                poster_path={movie.poster_path}
-                backdrop_path={movie.backdrop_path}
-              />
-            ) : (
-              <VidsrcPlayer
-                mediaType="movie"
-                tmdbId={id}
-                title={movie.title}
-              />
-            )}
+            <ActivePlayerComponent
+              mediaType="movie"
+              tmdbId={id}
+              {...(needsWatchHistoryProps ? {
+                progress: savedProgress,
+                title: movie.title,
+                poster_path: movie.poster_path,
+                backdrop_path: movie.backdrop_path,
+              } : {
+                title: movie.title,
+              })}
+            />
           </PiPPlayer>
           <PlayerSelector onPlayerChange={setActivePlayer} />
         </div>

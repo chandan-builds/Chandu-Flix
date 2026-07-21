@@ -1,74 +1,163 @@
-.player-selector-container {
+.server-selector {
+  margin: 16px 0;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.server-selector-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 16px 0;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  width: fit-content;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
-.player-selector-label {
+.server-selector-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 14px;
-  color: #aaa;
-  font-weight: 500;
-}
-
-.player-select-dropdown {
-  background: #141414;
+  font-weight: 600;
   color: #fff;
-  border: 1px solid #333;
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-  outline: none;
+  letter-spacing: 0.02em;
+}
+
+.server-label-dot {
+  width: 3px;
+  height: 16px;
+  background: #e50914;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.server-selector-hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}
+
+.server-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.server-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  outline: none;
+  white-space: nowrap;
+  font-family: inherit;
 }
 
-.player-select-dropdown:hover {
-  background: #1f1f1f;
-  border-color: #e50914;
+.server-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
-.player-select-dropdown:focus {
+.server-pill.active {
+  background: linear-gradient(135deg, #e50914, #b2070f);
   border-color: #e50914;
-  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.4);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 0 20px rgba(229, 9, 20, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.server-pill.active:hover {
+  background: linear-gradient(135deg, #f40612, #c4080f);
+}
+
+.server-pill-name {
+  font-size: 13px;
+}
+
+.server-pill-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.server-pill.active .server-pill-tag {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.server-pill.primary .server-pill-tag {
+  color: rgba(255, 180, 170, 0.9);
+}
+
+.server-pill.active.primary .server-pill-tag {
+  color: #fff;
 }
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
-  .player-selector-container {
-    width: 100%;
-    justify-content: space-between;
-    padding: 10px 12px;
+  .server-selector {
     margin: 12px 0;
+    padding: 14px 16px;
+    border-radius: 12px;
   }
 
-  .player-selector-label {
-    font-size: 13px;
+  .server-pills {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
-  .player-select-dropdown {
-    font-size: 13px;
+  .server-pills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .server-pill {
     padding: 8px 12px;
-    flex: 1;
-    max-width: 180px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .server-selector-hint {
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
-  .player-selector-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+  .server-selector {
+    padding: 12px 14px;
   }
 
-  .player-select-dropdown {
-    width: 100%;
-    max-width: none;
-    padding: 10px 12px;
+  .server-selector-label {
+    font-size: 13px;
+  }
+
+  .server-pill {
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+
+  .server-pill-tag {
+    font-size: 9px;
+    padding: 1px 5px;
   }
 }
