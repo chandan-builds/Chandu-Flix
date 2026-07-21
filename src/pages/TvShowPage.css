@@ -5,6 +5,32 @@
   padding-bottom: 60px;
 }
 
+/* ── Player Section ── */
+.player-section {
+  padding-top: 70px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 4%;
+  padding-right: 4%;
+}
+
+.player-section .peachify-player-wrapper,
+.player-section .vidking-player-wrapper,
+.player-section .moviebox-player-wrapper {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.player-section iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
 /* ── Loading / Error ── */
 .tv-loading,
 .tv-error {
