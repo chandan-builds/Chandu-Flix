@@ -38,7 +38,10 @@ const MovieBoxPlayer = ({
         const searchType = mediaType === 'tv' ? 2 : 1;
         const searchRes = await fetch('/moviebox-api/subject/search', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Request-Lang': 'en'
+          },
           body: JSON.stringify({
             keyword: searchTitle,
             page: '1',

@@ -5,6 +5,10 @@
       "destination": "https://api.themoviedb.org/3/:path*"
     },
     {
+      "source": "/moviebox-api/:path*",
+      "destination": "https://h5-api.aoneroom.com/wefeed-h5api-bff/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }
