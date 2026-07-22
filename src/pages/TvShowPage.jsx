@@ -16,10 +16,16 @@ import VidLinkPlayer from '../components/VidLinkPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import DownloadButton from '../components/DownloadButton';
 import PlayerWrapper from '../components/PlayerWrapper';
+import VRapidPlayer from '../components/VRapidPlayer';
+import VEdgePlayer from '../components/VEdgePlayer';
+import CobraPlayer from '../components/CobraPlayer';
 import './TvShowPage.css';
 
 const PLAYER_MAP = {
   vidlink: VidLinkPlayer,
+  vrapid: VRapidPlayer,
+  vedge: VEdgePlayer,
+  cobra: CobraPlayer,
   moviebox: MovieBoxPlayer,
   peachify: PeachifyPlayer,
   vidking: VidKingPlayer,

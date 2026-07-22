@@ -4,6 +4,9 @@ import './PlayerSelector.css';
 
 const SERVERS = [
   { id: 'vidlink', name: 'VidLink', tag: '⚡ Native', tier: 'primary' },
+  { id: 'vrapid', name: 'vRapid', tag: '4K', tier: 'primary' },
+  { id: 'vedge', name: 'vEdge', tag: 'Fast', tier: 'primary' },
+  { id: 'cobra', name: 'Cobra', tag: 'Multi-Audio', tier: 'primary' },
   { id: 'peachify', name: 'Peachify', tag: '🔥 Best', tier: 'primary' },
   { id: 'vidking', name: 'VidKing', tag: 'Fast', tier: 'primary' },
   { id: 'moviebox', name: 'MovieBox', tag: 'Native Alt', tier: 'primary' },
