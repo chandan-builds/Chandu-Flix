@@ -2,10 +2,27 @@ import { useState } from 'react';
 
 const CobraPlayer = ({ mediaType = 'movie', tmdbId, season = 1, episode = 1, title }) => {
   const [loading, setLoading] = useState(true);
+  const [sourceIndex, setSourceIndex] = useState(0);
 
-  const src = mediaType === 'tv'
-    ? `https://embed.su/embed/tv/${tmdbId}/${season}/${episode}`
-    : `https://embed.su/embed/movie/${tmdbId}`;
+  const sources = mediaType === 'tv'
+    ? [
+        `https://embed.su/embed/tv/${tmdbId}/${season}/${episode}`,
+        `https://multiembed.mov/directstream.php?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}`,
+        `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`
+      ]
+    : [
+        `https://embed.su/embed/movie/${tmdbId}`,
+        `https://multiembed.mov/directstream.php?video_id=${tmdbId}&tmdb=1`,
+        `https://www.2embed.cc/embed/${tmdbId}`
+      ];
+
+  const src = sources[sourceIndex] || sources[0];
+
+  const handleNextSource = () => {
+    if (sourceIndex < sources.length - 1) {
+      setSourceIndex((prev) => prev + 1);
+    }
+  };
 
   return (
     <div className="peachify-player-wrapper" style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -23,6 +40,7 @@ const CobraPlayer = ({ mediaType = 'movie', tmdbId, season = 1, episode = 1, tit
         allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
         referrerPolicy="origin"
         onLoad={() => setLoading(false)}
+        onError={handleNextSource}
       />
     </div>
   );

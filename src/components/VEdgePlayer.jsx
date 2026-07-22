@@ -2,10 +2,27 @@ import { useState } from 'react';
 
 const VEdgePlayer = ({ mediaType = 'movie', tmdbId, season = 1, episode = 1, title }) => {
   const [loading, setLoading] = useState(true);
+  const [sourceIndex, setSourceIndex] = useState(0);
 
-  const src = mediaType === 'tv'
-    ? `https://vidsrc.pro/embed/tv/${tmdbId}/${season}/${episode}`
-    : `https://vidsrc.pro/embed/movie/${tmdbId}`;
+  const sources = mediaType === 'tv'
+    ? [
+        `https://vidsrc.xyz/embed/tv/${tmdbId}/${season}/${episode}`,
+        `https://vidsrc.in/embed/tv/${tmdbId}/${season}/${episode}`,
+        `https://vidsrc.pm/embed/tv/${tmdbId}/${season}/${episode}`
+      ]
+    : [
+        `https://vidsrc.xyz/embed/movie/${tmdbId}`,
+        `https://vidsrc.in/embed/movie/${tmdbId}`,
+        `https://vidsrc.pm/embed/movie/${tmdbId}`
+      ];
+
+  const src = sources[sourceIndex] || sources[0];
+
+  const handleNextSource = () => {
+    if (sourceIndex < sources.length - 1) {
+      setSourceIndex((prev) => prev + 1);
+    }
+  };
 
   return (
     <div className="peachify-player-wrapper" style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -23,6 +40,7 @@ const VEdgePlayer = ({ mediaType = 'movie', tmdbId, season = 1, episode = 1, tit
         allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
         referrerPolicy="origin"
         onLoad={() => setLoading(false)}
+        onError={handleNextSource}
       />
     </div>
   );

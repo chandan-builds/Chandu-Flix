@@ -2,10 +2,27 @@ import { useState } from 'react';
 
 const VRapidPlayer = ({ mediaType = 'movie', tmdbId, season = 1, episode = 1, title }) => {
   const [loading, setLoading] = useState(true);
+  const [sourceIndex, setSourceIndex] = useState(0);
 
-  const src = mediaType === 'tv'
-    ? `https://vidsrc.icu/embed/tv/${tmdbId}/${season}/${episode}`
-    : `https://vidsrc.icu/embed/movie/${tmdbId}`;
+  const sources = mediaType === 'tv'
+    ? [
+        `https://vidsrc.cc/v2/embed/tv/${tmdbId}/${season}/${episode}`,
+        `https://vidsrc.vip/embed/tv/${tmdbId}/${season}/${episode}`,
+        `https://vidsrc.xyz/embed/tv/${tmdbId}/${season}/${episode}`
+      ]
+    : [
+        `https://vidsrc.cc/v2/embed/movie/${tmdbId}`,
+        `https://vidsrc.vip/embed/movie/${tmdbId}`,
+        `https://vidsrc.xyz/embed/movie/${tmdbId}`
+      ];
+
+  const src = sources[sourceIndex] || sources[0];
+
+  const handleNextSource = () => {
+    if (sourceIndex < sources.length - 1) {
+      setSourceIndex((prev) => prev + 1);
+    }
+  };
 
   return (
     <div className="peachify-player-wrapper" style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -23,6 +40,7 @@ const VRapidPlayer = ({ mediaType = 'movie', tmdbId, season = 1, episode = 1, ti
         allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
         referrerPolicy="origin"
         onLoad={() => setLoading(false)}
+        onError={handleNextSource}
       />
     </div>
   );
