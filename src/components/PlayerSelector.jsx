@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Tv } from 'lucide-react';
 import './PlayerSelector.css';
 
 const SERVERS = [
@@ -12,7 +13,7 @@ const SERVERS = [
   { id: 'smashy', name: 'Smashy', tag: 'Alt', tier: 'secondary' },
 ];
 
-const PlayerSelector = ({ onPlayerChange }) => {
+const PlayerSelector = ({ onPlayerChange, isPipActive, onTogglePip }) => {
   const [selectedPlayer, setSelectedPlayer] = useState(() => {
     return localStorage.getItem('preferred_player') || 'vidlink';
   });
@@ -25,11 +26,24 @@ const PlayerSelector = ({ onPlayerChange }) => {
   return (
     <div className="server-selector">
       <div className="server-selector-header">
-        <span className="server-selector-label">
-          <span className="server-label-dot" />
-          Stream Servers
-        </span>
-        <span className="server-selector-hint">Switch if one doesn't load</span>
+        <div className="server-selector-title-group">
+          <span className="server-selector-label">
+            <span className="server-label-dot" />
+            SELECT SERVER SOURCE
+          </span>
+          <span className="server-selector-hint">Switch if one doesn't load</span>
+        </div>
+
+        {onTogglePip && (
+          <button
+            className={`pip-toggle-btn ${isPipActive ? 'active' : ''}`}
+            onClick={onTogglePip}
+            title={isPipActive ? 'Exit Picture-in-Picture mode' : 'Open Picture-in-Picture window'}
+          >
+            <Tv size={15} />
+            <span>{isPipActive ? 'Exit PiP' : 'PiP'}</span>
+          </button>
+        )}
       </div>
       <div className="server-pills">
         {SERVERS.map((server) => (

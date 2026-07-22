@@ -15,6 +15,7 @@ import MovieBoxPlayer from '../components/MovieBoxPlayer';
 import VidLinkPlayer from '../components/VidLinkPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import DownloadButton from '../components/DownloadButton';
+import PlayerWrapper from '../components/PlayerWrapper';
 import './TvShowPage.css';
 
 const PLAYER_MAP = {
@@ -39,6 +40,7 @@ const TvShowPage = () => {
   const [seasonData, setSeasonData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPipActive, setIsPipActive] = useState(false);
   const [activePlayer, setActivePlayer] = useState(() => {
     return localStorage.getItem('preferred_player') || 'vidlink';
   });
@@ -130,6 +132,11 @@ const TvShowPage = () => {
       {/* Player or Hero */}
       {isPlaying ? (
         <div className="player-section">
+          <PlayerWrapper
+            title={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
+            isPipActive={isPipActive}
+            setIsPipActive={setIsPipActive}
+          >
             <ActivePlayerComponent
               mediaType="tv"
               tmdbId={id}
@@ -148,13 +155,18 @@ const TvShowPage = () => {
                 title: `${show.name} - S${selectedSeason}E${selectedEpisode}`,
               })}
             />
+          </PlayerWrapper>
           <div className="now-playing-info">
             <h3>
               S{selectedSeason} E{selectedEpisode}
               {currentEpisode?.name && ` — ${currentEpisode.name}`}
             </h3>
           </div>
-          <PlayerSelector onPlayerChange={setActivePlayer} />
+          <PlayerSelector
+            onPlayerChange={setActivePlayer}
+            isPipActive={isPipActive}
+            onTogglePip={() => setIsPipActive((prev) => !prev)}
+          />
         </div>
       ) : (
         <div

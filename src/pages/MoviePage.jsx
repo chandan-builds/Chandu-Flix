@@ -15,6 +15,7 @@ import MovieBoxPlayer from '../components/MovieBoxPlayer';
 import VidLinkPlayer from '../components/VidLinkPlayer';
 import PlayerSelector from '../components/PlayerSelector';
 import DownloadButton from '../components/DownloadButton';
+import PlayerWrapper from '../components/PlayerWrapper';
 import './MoviePage.css';
 
 const PLAYER_MAP = {
@@ -35,6 +36,7 @@ const MoviePage = () => {
   const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPipActive, setIsPipActive] = useState(false);
   const [activePlayer, setActivePlayer] = useState(() => {
     return localStorage.getItem('preferred_player') || 'vidlink';
   });
@@ -94,6 +96,11 @@ const MoviePage = () => {
       {/* Player or Hero */}
       {isPlaying ? (
         <div className="player-section">
+          <PlayerWrapper
+            title={movie.title}
+            isPipActive={isPipActive}
+            setIsPipActive={setIsPipActive}
+          >
             <ActivePlayerComponent
               mediaType="movie"
               tmdbId={id}
@@ -110,7 +117,12 @@ const MoviePage = () => {
                 title: movie.title,
               })}
             />
-          <PlayerSelector onPlayerChange={setActivePlayer} />
+          </PlayerWrapper>
+          <PlayerSelector
+            onPlayerChange={setActivePlayer}
+            isPipActive={isPipActive}
+            onTogglePip={() => setIsPipActive((prev) => !prev)}
+          />
         </div>
       ) : (
         <div
