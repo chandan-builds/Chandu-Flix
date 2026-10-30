@@ -1,41 +1,26 @@
-import { useNavigate } from 'react-router-dom';
-import './GenreChips.css';
-
-const GENRE_CHIPS = [
-  { id: 'all', label: '🔥 Trending', path: '/' },
-  { id: 28, label: '💥 Action', path: '/movies?genre=28' },
-  { id: 35, label: '😂 Comedy', path: '/movies?genre=35' },
-  { id: 27, label: '👻 Horror', path: '/movies?genre=27' },
-  { id: 878, label: '🚀 Sci-Fi', path: '/movies?genre=878' },
-  { id: 10749, label: '❤️ Romance', path: '/movies?genre=10749' },
-  { id: 53, label: '🔪 Thriller', path: '/movies?genre=53' },
-  { id: 16, label: '🎌 Animation', path: '/movies?genre=16' },
-  { id: 80, label: '🔫 Crime', path: '/movies?genre=80' },
-  { id: 99, label: '📹 Documentary', path: '/movies?genre=99' },
-  { id: 10752, label: '⚔️ War', path: '/movies?genre=10752' },
-  { id: 'tv', label: '📺 TV Shows', path: '/tv-shows' },
-  { id: 'bollywood', label: '🇮🇳 Bollywood', path: '/movies?region=IN' },
-  { id: 'korean', label: '🇰🇷 K-Drama', path: '/tv-shows?region=KR' },
+import { Link } from "react-router-dom";
+import "./GenreChips.css";
+const categories = [
+  ["All stories", "/movies"],
+  ["Action", "/movies?genre=28"],
+  ["Comedy", "/movies?genre=35"],
+  ["Thriller", "/movies?genre=53"],
+  ["Sci-fi", "/movies?genre=878"],
+  ["Romance", "/movies?genre=10749"],
+  ["Animation", "/movies?genre=16"],
+  ["Drama", "/movies?genre=18"],
+  ["Documentary", "/movies?genre=99"],
 ];
-
-const GenreChips = () => {
-  const navigate = useNavigate();
-
+export default function GenreChips() {
   return (
-    <div className="genre-chips-container">
+    <nav className="genre-chips-container" aria-label="Explore genres">
       <div className="genre-chips-scroll">
-        {GENRE_CHIPS.map((chip) => (
-          <button
-            key={chip.id}
-            className="genre-chip"
-            onClick={() => navigate(chip.path)}
-          >
-            {chip.label}
-          </button>
+        {categories.map(([label, path]) => (
+          <Link className="genre-chip" key={label} to={path}>
+            {label}
+          </Link>
         ))}
       </div>
-    </div>
+    </nav>
   );
-};
-
-export default GenreChips;
+}

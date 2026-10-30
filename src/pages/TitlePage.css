@@ -1,0 +1,272 @@
+.detail-page {
+  padding: 110px var(--page-padding) 70px;
+  max-width: 2400px;
+  margin: auto;
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  margin-bottom: 24px;
+}
+.detail-hero {
+  min-height: 620px;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.detail-copy {
+  padding: clamp(24px, 5vw, 80px);
+  max-width: 780px;
+}
+.detail-copy h1 {
+  font-size: clamp(2.5rem, 5vw, 5.3rem);
+  line-height: 1.07;
+  margin: 18px 0;
+}
+.detail-meta {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 22px 0;
+}
+.detail-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.rating {
+  color: #eac883;
+}
+.detail-genres {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.detail-overview {
+  color: #c4c8d1;
+  line-height: 1.85;
+  margin: 20px 0 28px;
+}
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--accent-color);
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  min-height: 48px;
+  padding: 12px 24px;
+  font: 600 1rem var(--font-family);
+  cursor: pointer;
+}
+.detail-section {
+  margin-top: 52px;
+}
+.detail-section h2 {
+  font-size: 1.8rem;
+  margin: 8px 0 24px;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.season-label {
+  color: var(--text-secondary);
+}
+.season-label select {
+  background: #1b2029;
+  color: white;
+  padding: 12px;
+  border: 1px solid #343b48;
+  border-radius: 8px;
+  margin-left: 10px;
+  font: inherit;
+}
+.episodes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.episode-tile {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: #14181f;
+  border: 1px solid #242a35;
+  color: inherit;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.episode-tile.selected {
+  border-color: var(--accent-color);
+}
+.episode-tile img {
+  width: 130px;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+  border-radius: 6px;
+}
+.episode-tile > div {
+  flex: 1;
+  min-width: 0;
+}
+.episode-tile h3 {
+  margin: 6px 0;
+  font-size: 1rem;
+}
+.episode-tile p {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.episode-tile > svg {
+  flex-shrink: 0;
+}
+.people-row {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  padding: 8px 4px 20px;
+}
+.person {
+  flex: 0 0 110px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+.person img,
+.person-placeholder {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  background: #242a35;
+}
+.person span {
+  color: var(--text-muted);
+}
+.recommendations {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 20px;
+}
+.recommendations a {
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.9rem;
+}
+.recommendations img {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+.native-player video {
+  width: 100%;
+  max-height: 78vh;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 12px;
+}
+.player-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 16px 0;
+  color: var(--text-secondary);
+}
+.player-caption span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+.player-empty {
+  min-height: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  background: radial-gradient(ellipse at top, #24232c, #101319 70%);
+  border: 1px solid #292e38;
+  border-radius: 16px;
+  text-align: center;
+  padding: 35px;
+}
+.player-empty p {
+  max-width: 510px;
+  color: var(--text-secondary);
+}
+.player-empty a {
+  color: inherit;
+}
+.now-playing {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+@media (max-width: 900px) {
+  .episodes-grid {
+    grid-template-columns: 1fr;
+  }
+  .recommendations {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .detail-hero {
+    min-height: 520px;
+  }
+}
+@media (max-width: 600px) {
+  .detail-page {
+    padding-top: 138px;
+  }
+  .detail-copy {
+    padding: 28px 20px;
+  }
+  .detail-hero {
+    background-position: 65% center;
+    min-height: 530px;
+  }
+  .episode-tile {
+    gap: 12px;
+    padding: 12px;
+  }
+  .episode-tile img {
+    width: 86px;
+  }
+  .recommendations {
+    gap: 12px;
+  }
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-bottom: 18px;
+  }
+  .player-caption {
+    flex-direction: column;
+  }
+  .player-empty {
+    min-height: 300px;
+  }
+  .detail-overview {
+    font-size: 0.95rem;
+  }
+}

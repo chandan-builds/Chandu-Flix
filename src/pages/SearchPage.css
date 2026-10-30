@@ -116,7 +116,9 @@
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--bg-secondary);
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
 }
 
 .search-result-card:hover {

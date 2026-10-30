@@ -2,15 +2,17 @@
   "rewrites": [
     {
       "source": "/tmdb/:path*",
-      "destination": "https://api.themoviedb.org/3/:path*"
+      "destination": "https://api.tmdb.org/3/:path*"
     },
-    {
-      "source": "/moviebox-api/:path*",
-      "destination": "https://h5-api.aoneroom.com/wefeed-h5api-bff/:path*"
-    },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ],
+  "headers": [
     {
       "source": "/(.*)",
-      "destination": "/"
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
     }
   ]
 }

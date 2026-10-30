@@ -1,83 +1,74 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { downloadApiPlugin } from './vite-download-plugin.js'
-
-let cachedToken = '';
-
-async function refreshMovieBoxToken() {
-  try {
-    const res = await fetch('https://h5-api.aoneroom.com/wefeed-h5api-bff/country-code', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'X-Request-Lang': 'en',
-        'X-Client-Info': JSON.stringify({ timezone: "Asia/Calcutta" }),
-        'X-Forwarded-For': '8.8.8.8',
-        'X-Real-IP': '8.8.8.8',
-        'CF-Connecting-IP': '8.8.8.8',
-        'Origin': 'https://movieboxonline.org',
-        'Referer': 'https://movieboxonline.org/'
-      }
-    });
-
-    const xUser = res.headers.get('x-user');
-    if (xUser) {
-      const parsed = JSON.parse(xUser);
-      if (parsed.token) {
-        cachedToken = parsed.token;
-        console.log('[Vite MovieBox Proxy] Guest token refreshed from x-user:', cachedToken.substring(0, 15) + '...');
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { catalogRequest } from "./server/boxoffice.js";
+import { playbackRequest, streamRequest } from "./server/playback.js";
+const catalogPlugin = {
+  name: "local-catalog-api",
+  configureServer(server) {
+    const sdkUrl = process.env.BOXOFFICE_SDK_URL || "http://127.0.0.1:17000";
+    server.middlewares.use("/api/stream", (req, res) =>
+      streamRequest(req, res, sdkUrl),
+    );
+    server.middlewares.use("/api/playback", async (req, res) => {
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Cache-Control", "private, no-store");
+      if (req.method !== "GET") {
+        res.statusCode = 405;
+        res.end(JSON.stringify({ error: "Method not allowed" }));
         return;
       }
-    }
-  } catch (err) {
-    console.error('[Vite MovieBox Proxy] Token refresh failed:', err);
-  }
-}
-
-// https://vite.dev/config/
-export default defineConfig(({ command }) => {
-  // Only start token refresh and proxy during local dev — never during Vercel build
-  if (command === 'serve') {
-    refreshMovieBoxToken();
-    setInterval(refreshMovieBoxToken, 15 * 60 * 1000);
-  }
-
-  return {
-    plugins: [react(), downloadApiPlugin()],
-    server: {
-      proxy: {
-        '/tmdb': {
-          target: 'https://api.themoviedb.org/3',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/tmdb/, ''),
-          secure: true,
-        },
-        '/moviebox-api': {
-          target: 'https://h5-api.aoneroom.com/wefeed-h5api-bff',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/moviebox-api/, ''),
-          secure: true,
-          configure: (proxy) => {
-            proxy.on('proxyReq', (proxyReq, req) => {
-              if (cachedToken && !req.url.includes('/subject/play')) {
-                proxyReq.setHeader('Authorization', `Bearer ${cachedToken}`);
-              }
-              proxyReq.setHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-              proxyReq.setHeader('Accept', 'application/json, text/plain, */*');
-              proxyReq.setHeader('Accept-Language', 'en-US,en;q=0.9');
-              proxyReq.setHeader('Sec-Ch-Ua', '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"');
-              proxyReq.setHeader('Sec-Ch-Ua-Mobile', '?0');
-              proxyReq.setHeader('Sec-Ch-Ua-Platform', '"Windows"');
-              proxyReq.setHeader('Sec-Fetch-Dest', 'empty');
-              proxyReq.setHeader('Sec-Fetch-Mode', 'cors');
-              proxyReq.setHeader('Sec-Fetch-Site', 'same-origin');
-              proxyReq.setHeader('X-Request-Lang', 'en');
-              proxyReq.setHeader('X-Client-Info', JSON.stringify({ timezone: "Asia/Calcutta" }));
-              proxyReq.setHeader('Origin', 'https://movieboxonline.org');
-              proxyReq.setHeader('Referer', 'https://movieboxonline.org/');
-            });
-          }
-        }
+      try {
+        const data = await playbackRequest(
+          new URL(req.url, "http://localhost").searchParams,
+          sdkUrl,
+        );
+        res.statusCode = 200;
+        res.end(JSON.stringify(data));
+      } catch (error) {
+        res.statusCode = error.status || 502;
+        res.end(
+          JSON.stringify({
+            error:
+              "Playback is temporarily unavailable. Please try again later.",
+          }),
+        );
       }
-    }
-  };
+    });
+    server.middlewares.use("/api/catalog", async (req, res) => {
+      res.setHeader("Content-Type", "application/json");
+      if (req.method !== "GET") {
+        res.statusCode = 405;
+        res.end(JSON.stringify({ error: "Method not allowed" }));
+        return;
+      }
+      try {
+        const data = await catalogRequest(
+          new URL(req.url, "http://localhost").searchParams,
+        );
+        res.statusCode = data.status || 200;
+        res.end(JSON.stringify(data));
+      } catch {
+        res.statusCode = 502;
+        res.end(
+          JSON.stringify({
+            error:
+              "The library is temporarily unavailable. Please try again later.",
+          }),
+        );
+      }
+    });
+  },
+};
+export default defineConfig({
+  plugins: [react(), catalogPlugin],
+  server: {
+    proxy: {
+      "/tmdb": {
+        target: "https://api.tmdb.org/3",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/tmdb/, ""),
+        secure: true,
+      },
+    },
+  },
 });

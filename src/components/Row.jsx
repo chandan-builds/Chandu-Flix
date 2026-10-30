@@ -1,146 +1,142 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Play, RefreshCw } from 'lucide-react';
-import { TMDB_IMAGE } from '../tmdb';
-import './Row.css';
-
-const Row = ({ title, fetchUrl, isLargeRow = false }) => {
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight, Play, RefreshCw } from "lucide-react";
+import { TMDB_IMAGE } from "../tmdb";
+import "./Row.css";
+export default function Row({ title, subtitle, fetchUrl, isLargeRow = false }) {
+  const [result, setResult] = useState({ loading: true, items: [] });
+  const [retry, setRetry] = useState(0);
   const rowRef = useRef(null);
   const navigate = useNavigate();
-
-  const fetchData = async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const response = await fetch(fetchUrl);
-      const data = await response.json();
-      const results = data.results || [];
-      setMovies(results);
-      if (results.length === 0) setError(true);
-    } catch (err) {
-      console.error(`Failed to fetch ${title}:`, err);
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
-  }, [fetchUrl, title]);
-
-  const handleScroll = (direction) => {
-    if (rowRef.current) {
-      const { scrollLeft, clientWidth } = rowRef.current;
-      const scrollTo = direction === 'left' ? scrollLeft - clientWidth : scrollLeft + clientWidth;
-      rowRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
-    }
-  };
-
-  const handleClick = (movie) => {
-    // Determine if it's TV or movie
-    const mediaType = movie.media_type || (movie.first_air_date ? 'tv' : 'movie');
-    if (mediaType === 'tv') {
-      navigate(`/tv/${movie.id}`);
-    } else {
-      navigate(`/movie/${movie.id}`);
-    }
-  };
-
-  // Loading skeleton
-  if (loading) {
-    return (
-      <div className="row">
-        <h2>{title}</h2>
-        <div className="row-posters">
-          {Array.from({ length: 6 }).map((_, i) => (
+    const controller = new AbortController();
+    fetch(fetchUrl, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error("Catalog unavailable");
+        return response.json();
+      })
+      .then((data) =>
+        setResult({
+          items: (data.results || []).filter(
+            (item) => item.media_type !== "person",
+          ),
+        }),
+      )
+      .catch((error) => {
+        if (error.name !== "AbortError") setResult({ items: [], error: true });
+      });
+    return () => controller.abort();
+  }, [fetchUrl, retry]);
+  const scroll = (direction) =>
+    rowRef.current?.scrollBy({
+      left: direction * rowRef.current.clientWidth,
+      behavior: "smooth",
+    });
+  return (
+    <section className="row">
+      <h2>{title}</h2>
+      {subtitle && <p className="row-subtitle">{subtitle}</p>}
+      {result.loading ? (
+        <div
+          className="row-posters"
+          role="status"
+          aria-label={`Loading ${title}`}
+        >
+          {Array.from({ length: 6 }, (_, index) => (
             <div
-              key={i}
-              className={`row-poster-container ${isLargeRow ? 'large' : ''} skeleton-card`}
+              className={`row-poster-container ${isLargeRow ? "large" : ""}`}
+              key={index}
             >
-              <div className={`row-skeleton-img ${isLargeRow ? 'large' : ''}`} />
+              <div
+                className={`row-skeleton-img ${isLargeRow ? "large" : ""}`}
+              />
             </div>
           ))}
         </div>
-      </div>
-    );
-  }
-
-  // Error state with retry
-  if (error || movies.length === 0) {
-    return (
-      <div className="row">
-        <h2>{title}</h2>
+      ) : result.error || !result.items.length ? (
         <div className="row-error">
-          <p>Couldn't load this section</p>
-          <button className="row-retry-btn" onClick={fetchData}>
-            <RefreshCw size={14} /> Retry
+          <p>Couldn't load this collection.</p>
+          <button
+            className="row-retry-btn"
+            onClick={() => setRetry((value) => value + 1)}
+          >
+            <RefreshCw size={14} />
+            Try again
           </button>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="row">
-      <h2>{title}</h2>
-      <div className="row-wrapper">
-        <div className="slider-arrow left" onClick={() => handleScroll('left')}>
-          <ChevronLeft size={30} />
-        </div>
-        
-        <div className="row-posters" ref={rowRef}>
-          {movies.map((movie) => {
-            const imageSrc = isLargeRow
-              ? TMDB_IMAGE.poster(movie.poster_path)
-              : TMDB_IMAGE.thumbnail(movie.backdrop_path || movie.poster_path);
-
-            if (!imageSrc) return null;
-
-            const displayTitle = movie.title || movie.name || movie.original_name;
-            const dateStr = movie.release_date || movie.first_air_date;
-            const year = dateStr ? new Date(dateStr).getFullYear() : '';
-
-            return (
-              <div
-                key={movie.id}
-                className={`row-poster-container ${isLargeRow ? 'large' : ''}`}
-                onClick={() => handleClick(movie)}
-              >
-                <img
-                  className={`row-poster ${isLargeRow ? 'row-posterLarge' : ''}`}
-                  src={imageSrc}
-                  alt={displayTitle}
-                  loading="lazy"
-                />
-                <div className="poster-overlay">
-                  <div className="overlay-play">
-                    <Play fill="white" size={20} />
-                  </div>
-                  <div className="overlay-content">
-                    <h3>{displayTitle}</h3>
-                    <div className="overlay-meta">
-                      {movie.vote_average > 0 && (
-                        <span className="meta-rating">★ {movie.vote_average.toFixed(1)}</span>
-                      )}
-                      {year && <span className="meta-year">{year}</span>}
+      ) : (
+        <div className="row-wrapper">
+          <button
+            className="slider-arrow left"
+            aria-label={`Scroll ${title} left`}
+            onClick={() => scroll(-1)}
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <div className="row-posters" ref={rowRef}>
+            {result.items.map((movie) => {
+              const image = isLargeRow
+                ? TMDB_IMAGE.poster(movie.poster_path)
+                : TMDB_IMAGE.thumbnail(
+                    movie.backdrop_path || movie.poster_path,
+                  );
+              if (!image) return null;
+              const name = movie.title || movie.name;
+              const type =
+                movie.media_type || (movie.first_air_date ? "tv" : "movie");
+              const destination =
+                movie.provider === "boxoffice"
+                  ? `/library/${movie.id}?q=${encodeURIComponent(movie.title || movie.name)}`
+                  : `/${type}/${movie.id}`;
+              return (
+                <div
+                  key={`${type}:${movie.id}`}
+                  className={`row-poster-container ${isLargeRow ? "large" : ""}`}
+                  role="link"
+                  tabIndex={0}
+                  aria-label={`Explore ${name}`}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter")
+                      navigate(destination, { state: { item: movie } });
+                  }}
+                  onClick={() =>
+                    navigate(destination, { state: { item: movie } })
+                  }
+                >
+                  <img
+                    className={`row-poster ${isLargeRow ? "row-posterLarge" : ""}`}
+                    src={image}
+                    alt={name}
+                    loading="lazy"
+                  />
+                  <div className="poster-overlay">
+                    <div className="overlay-play">
+                      <Play fill="white" size={20} />
                     </div>
                   </div>
+                  <div className="card-caption">
+                    <strong>{name}</strong>
+                    <span>
+                      {(movie.release_date || movie.first_air_date || "").slice(
+                        0,
+                        4,
+                      )}{" "}
+                      <span>· {type === "tv" ? "Series" : "Movie"}</span>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+          <button
+            className="slider-arrow right"
+            aria-label={`Scroll ${title} right`}
+            onClick={() => scroll(1)}
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
-
-        <div className="slider-arrow right" onClick={() => handleScroll('right')}>
-          <ChevronRight size={30} />
-        </div>
-      </div>
-    </div>
+      )}
+    </section>
   );
-};
-
-export default Row;
+}

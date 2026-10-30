@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
-import { searchMulti, TMDB_IMAGE } from '../tmdb';
-import './SearchPage.css';
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
+import { searchMulti, TMDB_IMAGE } from "../tmdb";
+import "./SearchPage.css";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const query = searchParams.get('q') || '';
-  const typeFilter = searchParams.get('type') || 'all';
+  const query = searchParams.get("q") || "";
+  const typeFilter = searchParams.get("type") || "all";
 
   const [results, setResults] = useState([]);
   const [inputValue, setInputValue] = useState(query);
@@ -22,10 +22,12 @@ const SearchPage = () => {
     searchMulti(query)
       .then((data) => {
         let items = (data.results || []).filter(
-          (r) => r.media_type === 'movie' || r.media_type === 'tv'
+          (r) => r.media_type === "movie" || r.media_type === "tv",
         );
-        if (typeFilter === 'movie') items = items.filter((r) => r.media_type === 'movie');
-        if (typeFilter === 'tv') items = items.filter((r) => r.media_type === 'tv');
+        if (typeFilter === "movie")
+          items = items.filter((r) => r.media_type === "movie");
+        if (typeFilter === "tv")
+          items = items.filter((r) => r.media_type === "tv");
         setResults(items);
         setLoading(false);
       })
@@ -40,7 +42,7 @@ const SearchPage = () => {
   };
 
   const handleCardClick = (item) => {
-    if (item.media_type === 'tv') {
+    if (item.media_type === "tv") {
       navigate(`/tv/${item.id}`);
     } else {
       navigate(`/movie/${item.id}`);
@@ -66,20 +68,24 @@ const SearchPage = () => {
         {query && (
           <div className="search-tabs">
             <button
-              className={`search-tab ${typeFilter === 'all' ? 'active' : ''}`}
+              className={`search-tab ${typeFilter === "all" ? "active" : ""}`}
               onClick={() => navigate(`/search?q=${encodeURIComponent(query)}`)}
             >
               All
             </button>
             <button
-              className={`search-tab ${typeFilter === 'movie' ? 'active' : ''}`}
-              onClick={() => navigate(`/search?q=${encodeURIComponent(query)}&type=movie`)}
+              className={`search-tab ${typeFilter === "movie" ? "active" : ""}`}
+              onClick={() =>
+                navigate(`/search?q=${encodeURIComponent(query)}&type=movie`)
+              }
             >
               Movies
             </button>
             <button
-              className={`search-tab ${typeFilter === 'tv' ? 'active' : ''}`}
-              onClick={() => navigate(`/search?q=${encodeURIComponent(query)}&type=tv`)}
+              className={`search-tab ${typeFilter === "tv" ? "active" : ""}`}
+              onClick={() =>
+                navigate(`/search?q=${encodeURIComponent(query)}&type=tv`)
+              }
             >
               TV Shows
             </button>
@@ -89,7 +95,9 @@ const SearchPage = () => {
 
       {/* Results */}
       {loading ? (
-        <div className="search-loading"><div className="loading-spinner" /></div>
+        <div className="search-loading">
+          <div className="loading-spinner" />
+        </div>
       ) : !query ? (
         <div className="search-empty">
           <h2>Browse Content</h2>
@@ -106,11 +114,19 @@ const SearchPage = () => {
             <div
               key={item.id}
               className="search-result-card"
+              role="link"
+              tabIndex={0}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") event.currentTarget.click();
+              }}
               onClick={() => handleCardClick(item)}
             >
-              {(item.poster_path || item.backdrop_path) ? (
+              {item.poster_path || item.backdrop_path ? (
                 <img
-                  src={TMDB_IMAGE.poster(item.poster_path) || TMDB_IMAGE.thumbnail(item.backdrop_path)}
+                  src={
+                    TMDB_IMAGE.poster(item.poster_path) ||
+                    TMDB_IMAGE.thumbnail(item.backdrop_path)
+                  }
                   alt={item.title || item.name}
                   className="search-card-poster"
                   loading="lazy"
@@ -119,18 +135,22 @@ const SearchPage = () => {
                 <div className="search-card-placeholder" />
               )}
               <div className="search-card-info">
-                <span className="search-card-title">{item.title || item.name}</span>
+                <span className="search-card-title">
+                  {item.title || item.name}
+                </span>
                 <div className="search-card-meta">
                   <span className="search-card-type">
-                    {item.media_type === 'tv' ? 'TV Series' : 'Movie'}
+                    {item.media_type === "tv" ? "TV Series" : "Movie"}
                   </span>
                   {item.vote_average > 0 && (
-                    <span className="search-card-rating">★ {item.vote_average.toFixed(1)}</span>
+                    <span className="search-card-rating">
+                      ★ {item.vote_average.toFixed(1)}
+                    </span>
                   )}
                 </div>
                 {(item.release_date || item.first_air_date) && (
                   <span className="search-card-year">
-                    {(item.release_date || item.first_air_date).split('-')[0]}
+                    {(item.release_date || item.first_air_date).split("-")[0]}
                   </span>
                 )}
               </div>

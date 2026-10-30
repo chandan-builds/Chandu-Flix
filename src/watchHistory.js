@@ -1,20 +1,27 @@
 /**
  * Watch History — localStorage-based progress tracking
- * Works with VidKing's postMessage events
+ * Native video progress, stored on this device
  */
 
 const STORAGE_KEY = "chanduflix_watch_history";
 
 function getAll() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    return stored && typeof stored === "object" && !Array.isArray(stored)
+      ? stored
+      : {};
   } catch {
     return {};
   }
 }
 
 function saveAll(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    /* Playback works when storage is unavailable. */
+  }
 }
 
 /** Build a unique key per content item */
@@ -24,7 +31,17 @@ function buildKey(mediaType, id, season, episode) {
 }
 
 /** Save / update watch progress */
-export function saveProgress({ id, mediaType, currentTime, duration, season, episode, title, poster_path, backdrop_path }) {
+export function saveProgress({
+  id,
+  mediaType,
+  currentTime,
+  duration,
+  season,
+  episode,
+  title,
+  poster_path,
+  backdrop_path,
+}) {
   const all = getAll();
   const key = buildKey(mediaType, id, season, episode);
   const percentage = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -69,37 +86,4 @@ export function getContinueWatching(limit = 15) {
     .filter((item) => item.percentage >= 2 && item.percentage < 95)
     .sort((a, b) => b.updatedAt - a.updatedAt)
     .slice(0, limit);
-}
-
-/**
- * Attach this listener once at the app level to capture VidKing postMessage events.
- * It saves progress automatically whenever the player sends a timeupdate/pause/seeked event.
- *
- * Call with optional metadata (title, poster_path) so we can display items in Continue Watching.
- */
-export function createPlayerListener(metadata = {}) {
-  return function handleMessage(event) {
-    try {
-      const message = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-      if (message?.type !== "PLAYER_EVENT") return;
-
-      const d = message.data;
-      if (!d || !d.id) return;
-
-      // Only save on meaningful events
-      if (["timeupdate", "pause", "seeked", "ended"].includes(d.event)) {
-        saveProgress({
-          id: d.id,
-          mediaType: d.mediaType || "movie",
-          currentTime: d.currentTime || 0,
-          duration: d.duration || 0,
-          season: d.season,
-          episode: d.episode,
-          ...metadata,
-        });
-      }
-    } catch {
-      // Ignore non-JSON messages from other iframes
-    }
-  };
 }

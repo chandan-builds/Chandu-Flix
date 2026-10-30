@@ -1,19 +1,41 @@
-const API_KEY = "e1e4daa6fae8499bb36b579d3c7890d1";
+const API_KEY =
+  import.meta.env.VITE_TMDB_API_KEY || "e1e4daa6fae8499bb36b579d3c7890d1";
 const BASE_URL = "/tmdb";
 const IMAGE_BASE = "https://image.tmdb.org/t/p";
 
 export const TMDB_IMAGE = {
-  backdrop: (path) => path ? `${IMAGE_BASE}/original${path}` : null,
-  poster: (path) => path ? `${IMAGE_BASE}/w500${path}` : null,
-  thumbnail: (path) => path ? `${IMAGE_BASE}/w300${path}` : null,
-  profile: (path) => path ? `${IMAGE_BASE}/w185${path}` : null,
+  backdrop: (path) =>
+    path
+      ? path.startsWith("https://")
+        ? path
+        : `${IMAGE_BASE}/original${path}`
+      : null,
+  poster: (path) =>
+    path
+      ? path.startsWith("https://")
+        ? path
+        : `${IMAGE_BASE}/w500${path}`
+      : null,
+  thumbnail: (path) =>
+    path
+      ? path.startsWith("https://")
+        ? path
+        : `${IMAGE_BASE}/w300${path}`
+      : null,
+  profile: (path) => (path ? `${IMAGE_BASE}/w185${path}` : null),
 };
 
-/* ── Category row endpoints ── */
+async function catalogFetch(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok)
+    throw new Error(`Catalog request failed (${response.status})`);
+  return response;
+}
+
+/* Category row endpoints */
 const requests = {
   // Original categories
   fetchTrending: `${BASE_URL}/trending/all/week?api_key=${API_KEY}&language=en-US`,
-  fetchNetflixOriginals: `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_networks=213`,
   fetchTopRated: `${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=en-US`,
   fetchActionMovies: `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=28`,
   fetchComedyMovies: `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=35`,
@@ -42,99 +64,133 @@ const requests = {
 
 /* ── Genre lists ── */
 export const MOVIE_GENRES = [
-  { id: 28, name: 'Action' },
-  { id: 12, name: 'Adventure' },
-  { id: 16, name: 'Animation' },
-  { id: 35, name: 'Comedy' },
-  { id: 80, name: 'Crime' },
-  { id: 99, name: 'Documentary' },
-  { id: 18, name: 'Drama' },
-  { id: 10751, name: 'Family' },
-  { id: 14, name: 'Fantasy' },
-  { id: 36, name: 'History' },
-  { id: 27, name: 'Horror' },
-  { id: 10402, name: 'Music' },
-  { id: 9648, name: 'Mystery' },
-  { id: 10749, name: 'Romance' },
-  { id: 878, name: 'Sci-Fi' },
-  { id: 53, name: 'Thriller' },
-  { id: 10752, name: 'War' },
-  { id: 37, name: 'Western' },
+  { id: 28, name: "Action" },
+  { id: 12, name: "Adventure" },
+  { id: 16, name: "Animation" },
+  { id: 35, name: "Comedy" },
+  { id: 80, name: "Crime" },
+  { id: 99, name: "Documentary" },
+  { id: 18, name: "Drama" },
+  { id: 10751, name: "Family" },
+  { id: 14, name: "Fantasy" },
+  { id: 36, name: "History" },
+  { id: 27, name: "Horror" },
+  { id: 10402, name: "Music" },
+  { id: 9648, name: "Mystery" },
+  { id: 10749, name: "Romance" },
+  { id: 878, name: "Sci-Fi" },
+  { id: 53, name: "Thriller" },
+  { id: 10752, name: "War" },
+  { id: 37, name: "Western" },
 ];
 
 export const TV_GENRES = [
-  { id: 10759, name: 'Action & Adventure' },
-  { id: 16, name: 'Animation' },
-  { id: 35, name: 'Comedy' },
-  { id: 80, name: 'Crime' },
-  { id: 99, name: 'Documentary' },
-  { id: 18, name: 'Drama' },
-  { id: 10751, name: 'Family' },
-  { id: 10762, name: 'Kids' },
-  { id: 9648, name: 'Mystery' },
-  { id: 10763, name: 'News' },
-  { id: 10764, name: 'Reality' },
-  { id: 10765, name: 'Sci-Fi & Fantasy' },
-  { id: 10766, name: 'Soap' },
-  { id: 10767, name: 'Talk' },
-  { id: 10768, name: 'War & Politics' },
-  { id: 37, name: 'Western' },
+  { id: 10759, name: "Action & Adventure" },
+  { id: 16, name: "Animation" },
+  { id: 35, name: "Comedy" },
+  { id: 80, name: "Crime" },
+  { id: 99, name: "Documentary" },
+  { id: 18, name: "Drama" },
+  { id: 10751, name: "Family" },
+  { id: 10762, name: "Kids" },
+  { id: 9648, name: "Mystery" },
+  { id: 10763, name: "News" },
+  { id: 10764, name: "Reality" },
+  { id: 10765, name: "Sci-Fi & Fantasy" },
+  { id: 10766, name: "Soap" },
+  { id: 10767, name: "Talk" },
+  { id: 10768, name: "War & Politics" },
+  { id: 37, name: "Western" },
 ];
 
 /* ── Detail page endpoints ── */
 
 export async function fetchMovieDetails(id) {
-  const res = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&append_to_response=credits,similar,videos`);
+  const res = await catalogFetch(
+    `${BASE_URL}/movie/${id}?api_key=${API_KEY}&append_to_response=credits,similar,videos`,
+  );
   return res.json();
 }
 
 export async function fetchTvDetails(id) {
-  const res = await fetch(`${BASE_URL}/tv/${id}?api_key=${API_KEY}&append_to_response=credits,similar,videos`);
+  const res = await catalogFetch(
+    `${BASE_URL}/tv/${id}?api_key=${API_KEY}&append_to_response=credits,similar,videos`,
+  );
   return res.json();
 }
 
 export async function fetchTvSeason(tvId, seasonNum) {
-  const res = await fetch(`${BASE_URL}/tv/${tvId}/season/${seasonNum}?api_key=${API_KEY}`);
+  const res = await catalogFetch(
+    `${BASE_URL}/tv/${tvId}/season/${seasonNum}?api_key=${API_KEY}`,
+  );
   return res.json();
 }
 
 export async function searchMulti(query) {
-  const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=en-US&page=1`);
+  const res = await catalogFetch(
+    `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=en-US&page=1`,
+  );
   return res.json();
 }
 
 export async function fetchTrendingAll() {
-  const res = await fetch(requests.fetchTrending);
+  const res = await catalogFetch(requests.fetchTrending);
   return res.json();
 }
 
-/* ── NEW: Browse/Discover endpoints for genre pages ── */
+/* Browse and discover endpoints */
 
-export async function discoverMovies({ genre, region, sortBy = 'popularity.desc', page = 1 } = {}) {
+export async function discoverMovies({
+  genre,
+  region,
+  sortBy = "popularity.desc",
+  page = 1,
+  signal,
+} = {}) {
   const params = new URLSearchParams({
     api_key: API_KEY,
-    language: 'en-US',
+    language: "en-US",
     sort_by: sortBy,
     page: String(page),
-    'vote_count.gte': '50',
+    "vote_count.gte": "50",
   });
-  if (genre) params.set('with_genres', String(genre));
-  if (region) params.set('with_original_language', region === 'IN' ? 'hi' : region === 'KR' ? 'ko' : 'en');
-  const res = await fetch(`${BASE_URL}/discover/movie?${params.toString()}`);
+  if (genre) params.set("with_genres", String(genre));
+  if (region)
+    params.set(
+      "with_original_language",
+      region === "IN" ? "hi" : region === "KR" ? "ko" : "en",
+    );
+  const res = await catalogFetch(
+    `${BASE_URL}/discover/movie?${params.toString()}`,
+    { signal },
+  );
   return res.json();
 }
 
-export async function discoverTV({ genre, region, sortBy = 'popularity.desc', page = 1 } = {}) {
+export async function discoverTV({
+  genre,
+  region,
+  sortBy = "popularity.desc",
+  page = 1,
+  signal,
+} = {}) {
   const params = new URLSearchParams({
     api_key: API_KEY,
-    language: 'en-US',
-    sort_by: sortBy,
+    language: "en-US",
+    sort_by: sortBy.replace("primary_release_date", "first_air_date"),
     page: String(page),
-    'vote_count.gte': '20',
+    "vote_count.gte": "20",
   });
-  if (genre) params.set('with_genres', String(genre));
-  if (region) params.set('with_original_language', region === 'IN' ? 'hi' : region === 'KR' ? 'ko' : 'ja');
-  const res = await fetch(`${BASE_URL}/discover/tv?${params.toString()}`);
+  if (genre) params.set("with_genres", String(genre));
+  if (region)
+    params.set(
+      "with_original_language",
+      region === "IN" ? "hi" : region === "KR" ? "ko" : "ja",
+    );
+  const res = await catalogFetch(
+    `${BASE_URL}/discover/tv?${params.toString()}`,
+    { signal },
+  );
   return res.json();
 }
 

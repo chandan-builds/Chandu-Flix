@@ -1,47 +1,40 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { User } from 'lucide-react';
-import SearchBar from './SearchBar';
-import './Navbar.css';
-
-const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const location = useLocation();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const isActive = (path) => location.pathname === path;
-
+import { NavLink, Link } from "react-router-dom";
+import { Clapperboard, Search, MonitorPlay } from "lucide-react";
+import "./Navbar.css";
+export default function Navbar() {
   return (
-    <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
-      {/* Left: Logo + primary nav */}
-      <div className="navbar-left">
-        <Link to="/" className="logo-link">
-          <h1 className="logo">CHANDUFLIX</h1>
-        </Link>
-        <div className="navbar-links">
-          <Link to="/" className={`nav-text-link ${isActive('/') ? 'active' : ''}`}>Home</Link>
-          <Link to="/movies" className={`nav-text-link ${isActive('/movies') ? 'active' : ''}`}>Movies</Link>
-          <Link to="/tv-shows" className={`nav-text-link ${isActive('/tv-shows') ? 'active' : ''}`}>TV Shows</Link>
-          <Link to="/search" className={`nav-text-link ${isActive('/search') ? 'active' : ''}`}>Search</Link>
-        </div>
+    <nav className="site-nav" aria-label="Main navigation">
+      <Link to="/" className="brand" aria-label="ChanduFlix home">
+        <span className="brand-mark">
+          <Clapperboard size={22} />
+        </span>
+        CHANDU<span>FLIX</span>
+      </Link>
+      <div className="main-links">
+        <NavLink to="/" end>
+          Discover
+        </NavLink>
+        <NavLink to="/movies">Movies</NavLink>
+        <NavLink to="/tv-shows">Series</NavLink>
+        <NavLink to="/library">Library</NavLink>
+        <NavLink to="/search" className="mobile-search">
+          Search
+        </NavLink>
       </div>
-
-      {/* Right: Search + Profile */}
-      <div className="navbar-right">
-        <SearchBar triggerMode="icon" />
-        <div className="profile">
-          <User size={18} />
-        </div>
+      <div className="nav-tools">
+        <Link
+          to="/search"
+          className="nav-search"
+          aria-label="Search movies and series"
+        >
+          <Search size={17} />
+          <span>Find your next watch</span>
+          <kbd>↵</kbd>
+        </Link>
+        <span className="cinema-label">
+          <MonitorPlay size={17} /> Your cinema
+        </span>
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}
