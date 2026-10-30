@@ -35,7 +35,24 @@ const server = http.createServer(async (req, res) => {
   }
   if (url.pathname === "/health") {
     res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({ ready: true }));
+    res.setHeader("Cache-Control", "no-store");
+    const target = new URL("/control", sdkUrl);
+    target.search = new URLSearchParams({
+      msg: "verify",
+      device_id: "12345678901234567890",
+      ts: String(Date.now()),
+    }).toString();
+    let ready = false;
+    try {
+      const response = await fetch(target, {
+        signal: AbortSignal.timeout(3000),
+      });
+      ready = response.ok && /^[a-f0-9]{32}$/i.test((await response.text()).trim());
+    } catch {
+      ready = false;
+    }
+    res.statusCode = ready ? 200 : 503;
+    res.end(JSON.stringify({ ready }));
     return;
   }
   if (url.pathname === "/api/stream") {
