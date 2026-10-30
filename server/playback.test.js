@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { issueTicket, verifyTicket, playbackRequest } from "./playback.js";
+import { issueTicket, verifyTicket, playbackRequest, limitMediaRange } from "./playback.js";
 import { normalizeTitle } from "./boxoffice.js";
 
 test("stream tickets authenticate the native resource and reject tampering and expiry", () => {
@@ -22,6 +22,14 @@ test("invalid selections and missing runtime fail before creating an upstream se
     playbackRequest(new URLSearchParams("id=1"), null),
     (error) => error.status === 503,
   );
+});
+test("MP4 ranges stay small enough for the native service to finish", () => {
+  assert.equal(limitMediaRange(undefined), "bytes=0-1048575");
+  assert.equal(limitMediaRange("bytes=0-"), "bytes=0-1048575");
+  assert.equal(limitMediaRange("bytes=100-200"), "bytes=100-200");
+  assert.equal(limitMediaRange("bytes=100-9999999"), "bytes=100-1048675");
+  assert.equal(limitMediaRange("bytes=-2000000"), "bytes=-1048576");
+  assert.throws(() => limitMediaRange("bytes=0-3,5-8"), (error) => error.status === 416);
 });
 test("movie and season catalog records retain their source identities and media types", () => {
   assert.equal(

@@ -42,7 +42,7 @@ const server = http.createServer(async (req, res) => {
       device_id: "12345678901234567890",
       ts: String(Date.now()),
     }).toString();
-    let ready = false;
+    let ready;
     try {
       const response = await fetch(target, {
         signal: AbortSignal.timeout(3000),

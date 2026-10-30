@@ -9,6 +9,32 @@ export function configuredSDK() {
 }
 const serviceError = (message, status = 503) =>
   Object.assign(new Error(message), { status });
+const MEDIA_CHUNK_BYTES = 1024 * 1024;
+
+export function limitMediaRange(range) {
+  if (!range) return `bytes=0-${MEDIA_CHUNK_BYTES - 1}`;
+  const forward = /^bytes=(\d+)-(\d*)$/.exec(range);
+  if (forward) {
+    const start = Number(forward[1]);
+    const end = forward[2] ? Number(forward[2]) : Infinity;
+    if (
+      !Number.isSafeInteger(start) ||
+      !(end === Infinity || Number.isSafeInteger(end)) ||
+      end < start ||
+      start > Number.MAX_SAFE_INTEGER - MEDIA_CHUNK_BYTES
+    )
+      throw serviceError("Invalid media range", 416);
+    return `bytes=${start}-${Math.min(end, start + MEDIA_CHUNK_BYTES - 1)}`;
+  }
+  const suffix = /^bytes=-(\d+)$/.exec(range);
+  if (suffix) {
+    const length = Number(suffix[1]);
+    if (!Number.isSafeInteger(length) || length < 1)
+      throw serviceError("Invalid media range", 416);
+    return `bytes=-${Math.min(length, MEDIA_CHUNK_BYTES)}`;
+  }
+  throw serviceError("Invalid media range", 416);
+}
 
 export function issueTicket(path, expires = Date.now() + 6 * 60 * 60 * 1000) {
   const payload = Buffer.from(JSON.stringify({ path, expires })).toString(
@@ -143,7 +169,9 @@ export async function streamRequest(req, res, sdkUrl = configuredSDK()) {
     const query = new URL(req.url, "http://localhost").searchParams;
     const path = verifyTicket(query.get("ticket"));
     const headers = { ...sdkHeaders() };
-    if (req.headers.range) headers.Range = req.headers.range;
+    if (path.startsWith("/resource.mp4"))
+      headers.Range = limitMediaRange(req.headers.range);
+    else if (req.headers.range) headers.Range = req.headers.range;
     const timeout = setTimeout(() => controller.abort(), 15000);
     let upstream;
     try {

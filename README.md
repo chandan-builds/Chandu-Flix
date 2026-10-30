@@ -12,7 +12,7 @@ A responsive React/Vite cinema using the DeepCine Android media service and a co
 
 ## Preview
 
-The original preview image predates this refactor. See the local app for the current design.
+The current production site is [chandu-flix.vercel.app](https://chandu-flix.vercel.app).
 
 ## Local Development
 
@@ -38,11 +38,11 @@ Keyboard shortcuts: Space/K play or pause, left/right seek ten seconds, up/down 
 
 ## Production relay and Vercel
 
-The live Vercel site has not yet been updated. The Oracle VM runs the native SDK and `npm run relay` as systemd services. The Android app is launched and monitored by a separate watchdog. The relay binds only to VM loopback; a Caddy HTTPS reverse proxy is being prepared for Vercel. Android ADB and the SDK port must stay private.
+The live Vercel site uses the Oracle VM's native SDK and `npm run relay` systemd service. A watchdog starts and monitors DeepCine inside the ARM64 Android container, so playback does not depend on a phone. The relay binds only to VM loopback; Caddy serves it at `https://140-238-231-247.sslip.io`. Only SSH and HTTP/HTTPS are open to the VM. Android ADB and the native SDK port remain private.
 
 The included `npm run relay` service binds to loopback port 8787 by default. It requires `BOXOFFICE_SDK_URL` (the internal native service), `BOXOFFICE_SDK_TOKEN` (a strong bearer token), and `PLAYBACK_SIGNING_SECRET` (a strong shared ticket secret). Set `PLAYER_ORIGIN` to the exact frontend origin. `RELAY_HOST` and `PORT` control binding. Deploy this behind HTTPS on a host that can reach the native runtime.
 
-On Vercel, configure `BOXOFFICE_SDK_URL` and `BOXOFFICE_MEDIA_RELAY_URL` with the HTTPS relay address, and use the same `BOXOFFICE_SDK_TOKEN` and `PLAYBACK_SIGNING_SECRET`. These are server variables, never `VITE_` variables. Long video responses should go directly to the persistent relay. Missing production configuration produces an availability message.
+Vercel Production has `BOXOFFICE_SDK_URL` and `BOXOFFICE_MEDIA_RELAY_URL` set to the HTTPS relay origin, plus matching `BOXOFFICE_SDK_TOKEN` and `PLAYBACK_SIGNING_SECRET` as server-side Secret variables. Never use `VITE_` variables for these secrets. Long video responses go directly to the persistent relay. The relay caps MP4 byte ranges at 1 MiB because the native SDK truncated larger responses in testing. Missing production configuration produces an availability message.
 
 `public/media-library.json` can also hold private MP4/HLS sources for legacy TMDB detail routes, keyed by `movie:<id>` or `tv:<id>:<season>:<episode>`.
 
