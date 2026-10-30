@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { getProgress, saveProgress } from "../watchHistory";
 import { TMDB_IMAGE } from "../tmdb";
+import { subtitleAsVtt } from "../subtitles";
 import "./MediaPlayer.css";
 
 const formatTime = (value) => {
@@ -50,7 +51,13 @@ export default function MediaPlayer({
   const video = useRef(null),
     shell = useRef(null),
     hlsRef = useRef(null),
-    lastSaved = useRef(0);
+    lastSaved = useRef(0),
+    hideTimer = useRef(null),
+    recoveryTimer = useRef(null),
+    recoveryCount = useRef(0),
+    recoveryPosition = useRef(null),
+    resumeAfterRecovery = useRef(false),
+    uploadedTrackElement = useRef(null);
   const [playing, setPlaying] = useState(false),
     [time, setTime] = useState(0),
     [duration, setDuration] = useState(0),
@@ -64,11 +71,33 @@ export default function MediaPlayer({
     [fullscreen, setFullscreen] = useState(false),
     [failure, setFailure] = useState(""),
     [retry, setRetry] = useState(0),
-    [notice, setNotice] = useState("");
+    [notice, setNotice] = useState(""),
+    [buffering, setBuffering] = useState(false),
+    [controlsVisible, setControlsVisible] = useState(true),
+    [uploadedTrack, setUploadedTrack] = useState(null);
   const [captions, setCaptions] = useState([]),
     [caption, setCaption] = useState("off"),
     [internalAudio, setInternalAudio] = useState([]),
     [internalAudioValue, setInternalAudioValue] = useState("0");
+
+  const revealControls = () => {
+    setControlsVisible(true);
+    clearTimeout(hideTimer.current);
+    if (video.current && !video.current.paused && !menu)
+      hideTimer.current = setTimeout(() => setControlsVisible(false), 2800);
+  };
+
+  useEffect(() => {
+    clearTimeout(hideTimer.current);
+    if (playing && !menu)
+      hideTimer.current = setTimeout(() => setControlsVisible(false), 2800);
+    return () => clearTimeout(hideTimer.current);
+  }, [playing, menu]);
+
+  useEffect(() => () => clearTimeout(recoveryTimer.current), []);
+  useEffect(() => () => {
+    if (uploadedTrack?.url) URL.revokeObjectURL(uploadedTrack.url);
+  }, [uploadedTrack]);
 
   useEffect(() => {
     const element = video.current;
@@ -92,14 +121,17 @@ export default function MediaPlayer({
             return;
           }
           const hls = new Hls();
+          let networkRetries = 0;
           hlsRef.current = hls;
           hls.loadSource(source.url);
           hls.attachMedia(element);
           hls.on(Hls.Events.ERROR, (_, data) => {
-            if (data.fatal) {
-              hls.stopLoad();
-              setFailure("The video could not be loaded. Please try again.");
-            }
+            if (!data.fatal) return;
+            if (data.type === Hls.ErrorTypes.NETWORK_ERROR && networkRetries < 2) {
+              networkRetries += 1;
+              setBuffering(true);
+              hls.startLoad();
+            } else setFailure("The video could not be loaded. Please try again.");
           });
           hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, () => {
             setInternalAudio(
@@ -166,10 +198,10 @@ export default function MediaPlayer({
     if (!element) return;
     if (!hlsRef.current?.subtitleTracks?.length)
       setCaptions(
-        Array.from(element.textTracks).map((track, index) => ({
+        Array.from(element.textTracks).flatMap((track, index) => track === uploadedTrackElement.current?.track ? [] : [{
           id: `native-${index}`,
           name: track.label || track.language || `Subtitles ${index + 1}`,
-        })),
+        }]),
       );
     if (element.audioTracks?.length && audioOptions.length < 2)
       setInternalAudio(
@@ -183,12 +215,32 @@ export default function MediaPlayer({
     const element = video.current;
     const total = Number.isFinite(element.duration) ? element.duration : 0;
     setDuration(total);
-    const saved = getProgress(mediaType, id, season, episode);
+    const saved = recoveryPosition.current ?? getProgress(mediaType, id, season, episode);
+    recoveryPosition.current = null;
     if (saved > 0 && saved < total - 10) {
       element.currentTime = saved;
       setTime(saved);
     }
     syncTracks();
+    if (resumeAfterRecovery.current) {
+      resumeAfterRecovery.current = false;
+      element.play().catch(() => setNotice("Press play to continue."));
+    }
+  };
+  const handleMediaError = () => {
+    if (recoveryCount.current >= 2) {
+      setBuffering(false);
+      setFailure("The video could not be loaded after retrying. Please try again.");
+      return;
+    }
+    recoveryCount.current += 1;
+    recoveryPosition.current = video.current?.currentTime || 0;
+    resumeAfterRecovery.current = playing || !video.current?.paused;
+    setBuffering(true);
+    setNotice(`Reconnecting video (${recoveryCount.current}/2)…`);
+    clearTimeout(recoveryTimer.current);
+    recoveryTimer.current = setTimeout(() => setRetry((value) => value + 1),
+      recoveryCount.current * 700);
   };
   const togglePlay = async () => {
     const element = video.current;
@@ -231,8 +283,30 @@ export default function MediaPlayer({
       hls.subtitleDisplay = value !== "off";
     }
     Array.from(video.current.textTracks).forEach((track, index) => {
-      track.mode = value === `native-${index}` ? "showing" : "disabled";
+      track.mode = value === `native-${index}` ||
+        (value === "uploaded" && track === uploadedTrackElement.current?.track)
+        ? "showing" : "disabled";
     });
+  };
+  const loadSubtitleFile = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setNotice("Subtitle files must be smaller than 2 MB.");
+      return;
+    }
+    try {
+      const vtt = subtitleAsVtt(await file.text());
+      setUploadedTrack({
+        url: URL.createObjectURL(new Blob([vtt], { type: "text/vtt" })),
+        name: file.name,
+      });
+      setCaption("uploaded");
+      setNotice("Subtitles loaded from your device.");
+    } catch (error) {
+      setNotice(error.message);
+    }
   };
   const changeAudio = (value) => {
     persist(true);
@@ -333,6 +407,10 @@ export default function MediaPlayer({
   };
   const useExternalAudio = audioOptions.length > 1 || !internalAudio.length;
   const availableAudio = useExternalAudio ? audioOptions : internalAudio;
+  const availableCaptions = uploadedTrack
+    ? [...captions, { id: "uploaded", name: `Local: ${uploadedTrack.name}` }]
+    : captions;
+  const controlsShown = !playing || Boolean(menu) || controlsVisible;
   if (failure)
     return (
       <div className="player-empty" role="alert">
@@ -342,6 +420,8 @@ export default function MediaPlayer({
           className="primary-button"
           onClick={() => {
             setFailure("");
+            recoveryCount.current = 0;
+            recoveryPosition.current = null;
             setRetry((value) => value + 1);
           }}
         >
@@ -351,10 +431,13 @@ export default function MediaPlayer({
     );
   return (
     <div
-      className="native-player enhanced-player"
+      className={`native-player enhanced-player ${controlsShown ? "controls-visible" : "controls-hidden"}`}
       ref={shell}
       tabIndex={0}
-      onKeyDown={keyboard}
+      onKeyDown={(event) => { revealControls(); keyboard(event); }}
+      onPointerMove={revealControls}
+      onPointerDown={revealControls}
+      onFocusCapture={revealControls}
       aria-label={`${title} video player`}
     >
       <div className="video-stage">
@@ -374,9 +457,22 @@ export default function MediaPlayer({
             if (Number.isFinite(value)) setDuration(value);
           }}
           onLoadedData={syncTracks}
-          onPlay={() => setPlaying(true)}
+          onPlay={() => {
+            setPlaying(true);
+            setControlsVisible(true);
+            setBuffering(video.current.readyState < 3);
+            shell.current?.focus();
+          }}
+          onPlaying={() => {
+            setBuffering(false);
+            setNotice("");
+          }}
+          onWaiting={() => setBuffering(true)}
+          onStalled={() => setBuffering(true)}
+          onCanPlay={() => setBuffering(false)}
           onPause={() => {
             setPlaying(false);
+            setBuffering(false);
             persist(true);
           }}
           onEnded={() => {
@@ -396,9 +492,7 @@ export default function MediaPlayer({
             setVolume(video.current.volume);
             setMuted(video.current.muted);
           }}
-          onError={() =>
-            setFailure("The video could not be loaded. Please try again.")
-          }
+          onError={handleMediaError}
         >
           {(source.subtitles || []).map((track) => (
             <track
@@ -410,7 +504,31 @@ export default function MediaPlayer({
               onLoad={syncTracks}
             />
           ))}
+          {uploadedTrack && (
+            <track
+              key={uploadedTrack.url}
+              ref={(node) => {
+                uploadedTrackElement.current = node;
+                if (node && caption === "uploaded") node.track.mode = "showing";
+              }}
+              kind="subtitles"
+              src={uploadedTrack.url}
+              srcLang="und"
+              label={uploadedTrack.name}
+              onLoad={() => {
+                syncTracks();
+                if (uploadedTrackElement.current?.track)
+                  uploadedTrackElement.current.track.mode = "showing";
+              }}
+            />
+          )}
         </video>
+        {buffering && (
+          <div className="video-buffering" role="status" aria-live="polite">
+            <span className="loading-spinner" aria-hidden="true" />
+            <span>{notice.startsWith("Reconnecting") ? notice : "Buffering video…"}</span>
+          </div>
+        )}
         {!playing && (
           <button
             className="video-center-play"
@@ -421,7 +539,7 @@ export default function MediaPlayer({
           </button>
         )}
       </div>
-      <div className="player-controls">
+      <div className="player-controls" inert={!controlsShown}>
         <div className="player-timeline">
           <span>{formatTime(time)}</span>
           <div className="timeline-track">
@@ -611,16 +729,18 @@ export default function MediaPlayer({
                     onChange={(event) => changeCaption(event.target.value)}
                   >
                     <option value="off">Off</option>
-                    {captions.map((track) => (
+                    {availableCaptions.map((track) => (
                       <option key={track.id} value={track.id}>
                         {track.name}
                       </option>
                     ))}
                   </select>
                 </label>
-                {!captions.length && (
-                  <p>No subtitle tracks are available for this source.</p>
-                )}
+                {!availableCaptions.length && <p>This source has no subtitle track. Load an SRT or VTT file from your device below.</p>}
+                <label className="subtitle-file-label">
+                  Load subtitle file
+                  <input type="file" accept=".srt,.vtt,text/vtt,text/plain" onChange={loadSubtitleFile} />
+                </label>
               </>
             ) : (
               <>
@@ -640,7 +760,7 @@ export default function MediaPlayer({
                     ))}
                   </select>
                 </label>
-                <label>
+                {availableAudio.length > 1 ? <label>
                   Audio track
                   <select
                     aria-label="Audio track"
@@ -661,7 +781,7 @@ export default function MediaPlayer({
                       <option value="0">Original</option>
                     )}
                   </select>
-                </label>
+                </label> : <p>Only Original audio is supplied for this title. Other languages require an alternate audio source.</p>}
                 <label>
                   Subtitles
                   <select
@@ -670,9 +790,9 @@ export default function MediaPlayer({
                     onChange={(event) => changeCaption(event.target.value)}
                   >
                     <option value="off">
-                      Off{!captions.length ? " — no tracks available" : ""}
+                      Off{!availableCaptions.length ? " — no tracks available" : ""}
                     </option>
-                    {captions.map((track) => (
+                    {availableCaptions.map((track) => (
                       <option key={track.id} value={track.id}>
                         {track.name}
                       </option>

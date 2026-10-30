@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { issueTicket, verifyTicket, playbackRequest, limitMediaRange } from "./playback.js";
+import { issueTicket, verifyTicket, playbackRequest, limitMediaRange, fetchCompleteMp4Chunk } from "./playback.js";
 import { normalizeTitle } from "./boxoffice.js";
 
 test("stream tickets authenticate the native resource and reject tampering and expiry", () => {
@@ -30,6 +30,25 @@ test("MP4 ranges stay small enough for the native service to finish", () => {
   assert.equal(limitMediaRange("bytes=100-9999999"), "bytes=100-1048675");
   assert.equal(limitMediaRange("bytes=-2000000"), "bytes=-1048576");
   assert.throws(() => limitMediaRange("bytes=0-3,5-8"), (error) => error.status === 416);
+});
+
+test("an incomplete native MP4 chunk is retried before it reaches the viewer", async () => {
+  let calls = 0;
+  const fetchImpl = async () => {
+    calls++;
+    return new Response(calls === 1 ? "abc" : "abcd", {
+      status: 206,
+      headers: { "content-length": "4", "content-range": "bytes 0-3/100" },
+    });
+  };
+  const { body } = await fetchCompleteMp4Chunk(
+    new URL("http://localhost/resource.mp4"),
+    { Range: "bytes=0-3" },
+    new AbortController().signal,
+    fetchImpl,
+  );
+  assert.equal(body.toString(), "abcd");
+  assert.equal(calls, 2);
 });
 test("movie and season catalog records retain their source identities and media types", () => {
   assert.equal(

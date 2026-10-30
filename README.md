@@ -6,7 +6,9 @@ A responsive React/Vite cinema using the DeepCine Android media service and a co
 
 - Movies, series, keyword search, genre filters, pagination, seasons and episodes.
 - Play/pause, ten-second jumps, timeline, volume/mute, 0.5x–2x speed, fullscreen and browser-supported picture-in-picture.
-- Available audio/subtitle choices, an in-player episode menu, next episode and locally saved progress.
+- Controls fade during playback in the page and fullscreen; pointer, touch or keyboard activity reveals them.
+- Buffering status and automatic retries for incomplete native MP4 chunks or a failed player load.
+- Available audio/subtitle choices, local SRT/VTT subtitle loading, an in-player episode menu, next episode and locally saved progress.
 - Responsive layouts and keyboard controls for touch, desktop and large screens.
 
 
@@ -35,6 +37,8 @@ npm run dev
 The replacement DeepCine app runs in an Android ARM64 container on an Oracle A1 VM. The native SDK is private on the VM's Docker network. For local development, forward local TCP port 17000 over SSH to the container's TCP port 7000, then run `npm run dev`. The Vite playback API uses that loopback connection by default. The public site needs the separate HTTPS relay described below.
 
 Keyboard shortcuts: Space/K play or pause, left/right seek ten seconds, up/down adjust volume, M mute, F fullscreen, C captions. Focused player buttons support arrow-key navigation. Audio and subtitle menus reflect available sources and browser tracks; unavailable tracks are not fabricated. Embedded MP4 tracks that a browser does not expose cannot be selected there.
+
+DeepCine returned only Original audio and no subtitle tracks for the sampled Love in Disguise, Jailer and Breaking Bad sources. Requesting other DeepCine audio modes did not produce another option for those titles. The player explains this in its settings and can load a viewer-supplied SRT or VTT subtitle file locally in the browser; the file is not uploaded to the relay. Dubbed audio requires an alternate source or an exposed track.
 
 ## Production relay and Vercel
 

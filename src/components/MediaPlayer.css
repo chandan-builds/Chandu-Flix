@@ -39,11 +39,51 @@
   color: white;
   cursor: pointer;
   backdrop-filter: blur(6px);
+  z-index: 6;
 }
 .player-controls {
-  position: relative;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
   padding: 14px 20px 12px;
-  background: linear-gradient(#151922, #0e1118);
+  background: linear-gradient(transparent, #0b0e16db 32%, #0b0e16f5);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.enhanced-player.controls-hidden .player-controls {
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+}
+.enhanced-player.controls-hidden {
+  cursor: none;
+}
+.video-buffering {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-shadow: 0 2px 10px #000;
+  font-size: 0.9rem;
+  pointer-events: none;
+  background: #0002;
+}
+.video-buffering .loading-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid #ffffff55;
+  border-top-color: #f27c65;
+  border-radius: 50%;
+  animation: player-spin 800ms linear infinite;
+}
+@keyframes player-spin {
+  to { transform: rotate(360deg); }
 }
 .player-timeline {
   display: flex;
@@ -201,6 +241,14 @@
   font: inherit;
   font-size: 0.8rem;
 }
+.player-menu .subtitle-file-label {
+  align-items: flex-start;
+  flex-direction: column;
+}
+.subtitle-file-label input {
+  max-width: 100%;
+  font-size: 0.75rem;
+}
 .player-menu p {
   font-size: 0.78rem;
   color: #9faabc;
@@ -241,11 +289,21 @@
   padding-top: 10px;
 }
 .enhanced-player .player-caption {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9;
   padding: 12px 20px;
   margin: 0;
-  border-top: 1px solid #ffffff0c;
+  background: linear-gradient(#000b, transparent);
   font-size: 0.8rem;
   color: #aab4c3;
+  transition: opacity 180ms ease;
+}
+.enhanced-player.controls-hidden .player-caption {
+  opacity: 0;
+  pointer-events: none;
 }
 .enhanced-player .player-caption > span:first-child {
   color: #d4dae5;
@@ -271,7 +329,7 @@
 }
 .enhanced-player:fullscreen .player-controls,
 .enhanced-player:fullscreen .player-caption {
-  flex-shrink: 0;
+  position: absolute;
 }
 .control-button:disabled {
   opacity: 0.4;

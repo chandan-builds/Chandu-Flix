@@ -180,7 +180,7 @@ export default function LibraryPage() {
                     )}
                   </div>
                   {item.language && (
-                    <p className="detail-genres">{item.language}</p>
+                    <p className="detail-genres">Catalog language: {item.language}</p>
                   )}
                   {item.overview && (
                     <p className="detail-overview">{item.overview}</p>

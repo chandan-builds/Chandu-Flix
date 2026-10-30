@@ -1,5 +1,6 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { Readable } from "node:stream";
+import { setTimeout as delay } from "node:timers/promises";
 import { readCatalog, normalizeTitle, guestSession } from "./boxoffice.js";
 
 const signingKey =
@@ -34,6 +35,33 @@ export function limitMediaRange(range) {
     return `bytes=-${Math.min(length, MEDIA_CHUNK_BYTES)}`;
   }
   throw serviceError("Invalid media range", 416);
+}
+
+export async function fetchCompleteMp4Chunk(url, headers, signal, fetchImpl = fetch) {
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (signal.aborted) throw signal.reason;
+    try {
+      const response = await fetchImpl(url, {
+        headers,
+        signal: AbortSignal.any([signal, AbortSignal.timeout(15000)]),
+      });
+      if (response.status === 416) throw serviceError("Invalid media range", 416);
+      if (response.status !== 206) throw serviceError("Media chunk unavailable", 502);
+      const expected = Number(response.headers.get("content-length"));
+      if (!Number.isSafeInteger(expected) || expected < 1 || expected > MEDIA_CHUNK_BYTES)
+        throw serviceError("Invalid media chunk length", 502);
+      const body = Buffer.from(await response.arrayBuffer());
+      if (body.length !== expected)
+        throw serviceError("Incomplete media chunk", 502);
+      return { response, body };
+    } catch (error) {
+      if (error.status === 416 || signal.aborted) throw error;
+      lastError = error;
+      if (attempt < 2) await delay(250 * (attempt + 1), undefined, { signal });
+    }
+  }
+  throw lastError;
 }
 
 export function issueTicket(path, expires = Date.now() + 6 * 60 * 60 * 1000) {
@@ -159,6 +187,7 @@ export async function playbackRequest(query, sdkUrl = configuredSDK()) {
 
 export async function streamRequest(req, res, sdkUrl = configuredSDK()) {
   const controller = new AbortController();
+  res.on("close", () => controller.abort());
   try {
     ensureService(sdkUrl);
     if (!["GET", "HEAD"].includes(req.method)) {
@@ -172,15 +201,17 @@ export async function streamRequest(req, res, sdkUrl = configuredSDK()) {
     if (path.startsWith("/resource.mp4"))
       headers.Range = limitMediaRange(req.headers.range);
     else if (req.headers.range) headers.Range = req.headers.range;
-    const timeout = setTimeout(() => controller.abort(), 15000);
     let upstream;
-    try {
+    let completeChunk;
+    if (path.startsWith("/resource.mp4") && req.method === "GET") {
+      ({ response: upstream, body: completeChunk } = await fetchCompleteMp4Chunk(
+        new URL(path, sdkUrl), headers, controller.signal,
+      ));
+    } else {
       upstream = await fetch(new URL(path, sdkUrl), {
         headers,
-        signal: controller.signal,
+        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]),
       });
-    } finally {
-      clearTimeout(timeout);
     }
     res.statusCode = upstream.status;
     res.setHeader("Cache-Control", "private, no-store");
@@ -197,6 +228,10 @@ export async function streamRequest(req, res, sdkUrl = configuredSDK()) {
     if (req.method === "HEAD") {
       await upstream.body?.cancel();
       res.end();
+      return;
+    }
+    if (completeChunk) {
+      res.end(completeChunk);
       return;
     }
     if (!upstream.body) {

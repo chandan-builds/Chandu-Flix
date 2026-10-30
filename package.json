@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "relay": "node server/relay.js",
-    "test": "node --test src/mediaLibrary.test.js server/playback.test.js",
+    "test": "node --test src/mediaLibrary.test.js src/subtitles.test.js server/playback.test.js",
     "dev": "vite",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=4096 vite build",
     "lint": "eslint .",
