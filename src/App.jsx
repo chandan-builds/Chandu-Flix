@@ -61,7 +61,7 @@ export default function App() {
         <div className="footer-fine">
           <span>© {new Date().getFullYear()} ChanduFlix</span>
           <span>
-            Library metadata from DeepCine; discovery metadata and imagery by
+            Library metadata from BoxOffice; discovery metadata and imagery by
             TMDB. This product is not endorsed or certified by TMDB. Streaming
             availability varies by title.
           </span>
