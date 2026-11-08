@@ -17,7 +17,9 @@ export default function LibraryPage() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const query = params.get("q") || "";
-  const [input, setInput] = useState(query);
+  const [draft, setDraft] = useState({ query, text: query });
+  const input = draft.query === query ? draft.text : query;
+  const setInput = (text) => setDraft({ query, text });
   const initial = location.state?.item;
   const [result, setResult] = useState({
     items: initial ? [initial] : [],

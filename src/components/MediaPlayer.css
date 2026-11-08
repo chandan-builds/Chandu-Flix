@@ -6,6 +6,25 @@
   overflow: hidden;
   color: #f4f5f8;
 }
+.enhanced-player:not(:fullscreen) .video-stage {
+  height: min(56svh, 56.25vw);
+  min-height: 190px;
+  aspect-ratio: auto;
+}
+.native-player:not(:fullscreen) .video-stage video { max-height: none; aspect-ratio: auto; }
+.enhanced-player:not(:fullscreen) .player-controls {
+  position: relative;
+  background: #10141c;
+}
+.enhanced-player:not(:fullscreen) .player-menu {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  max-height: min(38svh, 330px);
+  margin-top: 12px;
+  box-shadow: none;
+}
 .video-stage {
   position: relative;
   background: #000;
