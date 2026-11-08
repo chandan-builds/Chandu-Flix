@@ -1,5 +1,17 @@
 # Boxoffice integration evidence
 
+## Current runtime: BoxOffice (8 November 2026)
+
+The owner requested replacing DeepCine with the modified BoxOffice APK tested on their phone. The catalog adapter now sends `package_name=com.fvvcl.flickverse` and `version=50000`, matching that working client. The installed Android runtime package is `com.fvvcl.flickverse.tv`; these identities differ intentionally because the modified APK is a separately signed install.
+
+The existing Oracle Android container was renamed `boxoffice-runtime`. DeepCine was uninstalled, its hosted APK removed, and its old watchdog deleted. At the owner's request no DeepCine rollback copy was retained. `boxoffice-watch.service` now monitors BoxOffice, with the same private Docker networking and authenticated HTTPS relay. No new VM or public Android/native ports were created.
+
+A server-only startup crash was corrected by making the app's signing-certificate lookup use its own installed package, rather than assuming the original mobile package also exists. The SDK's native verification flow remains intact.
+
+Verified search and native playback metadata for Jailer and Breaking Bad. Jailer returned one episode; Breaking Bad returned sixteen episodes and five seasons. Each native stream returned HTTP 206 with a complete 65,536-byte MP4 range and the expected `ftyp` header. The relay health endpoint reported ready. These observations cover sampled titles, not the entire catalog. Deployment and browser validation are recorded in the task's final report.
+
+The sections below describe earlier investigations and the superseded DeepCine deployment.
+
 Reference: https://github.com/anumeetkumar/boxoffice/tree/main
 
 The analyzed APK has SHA-256 `983170b637179f7c83eeeaf7cece6ce2cfb763e7e883c9a674615ad9d400c30f`. The copy pulled from the connected phone matched this artifact exactly. REA 6.7.0 with the checksum-verified JADX 0.7.1 provider indexed 42,488 classes. Focused decompilation used bounded package selections to avoid unrelated advertising libraries.

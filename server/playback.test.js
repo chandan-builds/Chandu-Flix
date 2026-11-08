@@ -1,7 +1,25 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { issueTicket, verifyTicket, playbackRequest, limitMediaRange, fetchCompleteMp4Chunk } from "./playback.js";
-import { normalizeTitle } from "./boxoffice.js";
+import { normalizeTitle, readCatalog } from "./boxoffice.js";
+import { createCipheriv } from "node:crypto";
+
+test("catalog requests use the working BoxOffice API identity", async (t) => {
+  const cipher = createCipheriv(
+    "aes-128-cbc", Buffer.from("0123456789123456"), Buffer.from("2015030120123456"),
+  );
+  const fixture = [{ vod_id: 17, vod_name: "Film" }];
+  const body = Buffer.concat([
+    cipher.update(JSON.stringify({ code: 10000, result: fixture })), cipher.final(),
+  ]).toString("base64");
+  t.mock.method(globalThis, "fetch", async (_url, options) => {
+    assert.equal(options.headers.package_name, "com.fvvcl.flickverse");
+    assert.equal(options.headers.version, "50000");
+    assert.equal(options.headers.en_al, "0");
+    return new Response(body);
+  });
+  assert.deepEqual(await readCatalog("/api/search/hot_search"), fixture);
+});
 
 test("stream tickets authenticate the native resource and reject tampering and expiry", () => {
   const path = "/resource.mp4?src=approved-source";

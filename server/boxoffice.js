@@ -19,8 +19,8 @@ export async function readCatalog(route, fields = {}, session = {}) {
     signal: AbortSignal.timeout(12000),
     headers: {
       app_id: "moviein",
-      package_name: "com.velvetreel.shorttv",
-      version: "40000",
+      package_name: "com.fvvcl.flickverse",
+      version: "50000",
       sys_platform: "2",
       mob_mfr: "generic",
       mobmodel: "catalog-client",

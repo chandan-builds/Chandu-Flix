@@ -1,6 +1,6 @@
 # Chandu-Flix
 
-A responsive React/Vite cinema using the DeepCine Android media service and a compatible catalog adapter for native MP4/HLS playback. The old provider iframes, server selector, MovieBox proxy and download-page proxy have been removed.
+A responsive React/Vite cinema using the BoxOffice Android media service and a compatible catalog adapter for native MP4/HLS playback. The catalog uses BoxOffice's working API version `50000`.
 
 ## Features
 
@@ -34,15 +34,15 @@ npm run dev
 
 ## Development playback
 
-The replacement DeepCine app runs in an Android ARM64 container on an Oracle A1 VM. The native SDK is private on the VM's Docker network. For local development, forward local TCP port 17000 over SSH to the container's TCP port 7000, then run `npm run dev`. The Vite playback API uses that loopback connection by default. The public site needs the separate HTTPS relay described below.
+The modified BoxOffice app (`com.fvvcl.flickverse.tv`) runs in the `boxoffice-runtime` Android ARM64 container on an Oracle A1 VM. The native SDK is private on the VM's Docker network. For local development, forward local TCP port 17000 over SSH to the container's TCP port 7000, then run `npm run dev`. The Vite playback API uses that loopback connection by default. The public site needs the separate HTTPS relay described below.
 
 Keyboard shortcuts: Space/K play or pause, left/right seek ten seconds, up/down adjust volume, M mute, F fullscreen, C captions. Focused player buttons support arrow-key navigation. Audio and subtitle menus reflect available sources and browser tracks; unavailable tracks are not fabricated. Embedded MP4 tracks that a browser does not expose cannot be selected there.
 
-DeepCine returned only Original audio and no subtitle tracks for the sampled Love in Disguise, Jailer and Breaking Bad sources. Requesting other DeepCine audio modes did not produce another option for those titles. The player explains this in its settings and can load a viewer-supplied SRT or VTT subtitle file locally in the browser; the file is not uploaded to the relay. Dubbed audio requires an alternate source or an exposed track.
+Audio/subtitle options depend on the source metadata and browser support. The player can load a viewer-supplied SRT or VTT subtitle file locally; the file is not uploaded to the relay. Dubbed audio requires an alternate source or an exposed track.
 
 ## Production relay and Vercel
 
-The live Vercel site uses the Oracle VM's native SDK and `npm run relay` systemd service. A watchdog starts and monitors DeepCine inside the ARM64 Android container, so playback does not depend on a phone. The relay binds only to VM loopback; Caddy serves it at `https://140-238-231-247.sslip.io`. Only SSH and HTTP/HTTPS are open to the VM. Android ADB and the native SDK port remain private.
+The live Vercel site uses the Oracle VM's native SDK and `npm run relay` systemd service. `boxoffice-watch.service` starts and monitors BoxOffice inside the ARM64 Android container, so playback does not depend on a phone. Its script and unit are in `server/boxoffice-watch.*`. DeepCine was uninstalled and its hosted APK and watchdog removed. The relay binds only to VM loopback; Caddy serves it at `https://140-238-231-247.sslip.io`. Only SSH and HTTP/HTTPS are open to the VM. Android ADB and the native SDK port remain private.
 
 The included `npm run relay` service binds to loopback port 8787 by default. It requires `BOXOFFICE_SDK_URL` (the internal native service), `BOXOFFICE_SDK_TOKEN` (a strong bearer token), and `PLAYBACK_SIGNING_SECRET` (a strong shared ticket secret). Set `PLAYER_ORIGIN` to the exact frontend origin. `RELAY_HOST` and `PORT` control binding. Deploy this behind HTTPS on a host that can reach the native runtime.
 
