@@ -79,6 +79,41 @@ export default function MediaPlayer({
     [caption, setCaption] = useState("off"),
     [internalAudio, setInternalAudio] = useState([]),
     [internalAudioValue, setInternalAudioValue] = useState("0");
+  const [preparedSource, setPreparedSource] = useState(null),
+    [trackPreparation, setTrackPreparation] = useState("");
+  const effectiveSource = preparedSource || source;
+
+  useEffect(() => {
+    if (!source.tracksUrl) return;
+    let active = true, timer;
+    const controller = new AbortController();
+    const poll = async () => {
+      try {
+        const response = await fetch(source.tracksUrl, {
+          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]),
+        });
+        if (!response.ok) throw new Error("Track preparation unavailable");
+        const data = await response.json();
+        if (!active) return;
+        setTrackPreparation(data.state);
+        if (data.state === "ready" && data.source) {
+          recoveryPosition.current = video.current?.currentTime || 0;
+          resumeAfterRecovery.current = Boolean(video.current && !video.current.paused);
+          setPreparedSource({
+            ...data.source,
+            url: new URL(data.source.url, source.tracksUrl).href,
+            subtitles: (data.source.subtitles || []).map((track) => ({
+              ...track, url: new URL(track.url, source.tracksUrl).href,
+            })),
+          });
+          return;
+        }
+        if (!["unavailable", "original"].includes(data.state)) timer = setTimeout(poll, 3000);
+      } catch { if (active) setTrackPreparation("unavailable"); }
+    };
+    void poll();
+    return () => { active = false; clearTimeout(timer); controller.abort(); };
+  }, [source]);
 
   const revealControls = () => {
     setControlsVisible(true);
@@ -110,7 +145,7 @@ export default function MediaPlayer({
       ? preference("speed", 1)
       : 1;
     if (
-      source.type === "hls" &&
+      effectiveSource.type === "hls" &&
       !element.canPlayType("application/vnd.apple.mpegurl")
     ) {
       import("hls.js")
@@ -123,7 +158,7 @@ export default function MediaPlayer({
           const hls = new Hls();
           let networkRetries = 0;
           hlsRef.current = hls;
-          hls.loadSource(source.url);
+          hls.loadSource(effectiveSource.url);
           hls.attachMedia(element);
           hls.on(Hls.Events.ERROR, (_, data) => {
             if (!data.fatal) return;
@@ -138,14 +173,21 @@ export default function MediaPlayer({
               hls.audioTracks.map((track, index) => ({
                 id: String(index),
                 name: track.name || track.lang || `Audio ${index + 1}`,
+                language: track.lang || "",
               })),
             );
+            try {
+              const preferred = localStorage.getItem("chanduflix_audio_language");
+              const index = hls.audioTracks.findIndex((track) => track.lang === preferred);
+              if (index >= 0) { hls.audioTrack = index; setInternalAudioValue(String(index)); }
+            } catch { /* Tracks remain selectable without local storage. */ }
           });
           hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, () => {
             setCaptions(
               hls.subtitleTracks.map((track, index) => ({
                 id: `hls-${index}`,
                 name: track.name || track.lang || `Subtitles ${index + 1}`,
+                language: track.lang || "",
               })),
             );
           });
@@ -154,7 +196,7 @@ export default function MediaPlayer({
           if (active)
             setFailure("The player could not load. Please try again.");
         });
-    } else element.src = source.url;
+    } else element.src = effectiveSource.url;
     return () => {
       active = false;
       hlsRef.current?.destroy();
@@ -162,7 +204,7 @@ export default function MediaPlayer({
       element.removeAttribute("src");
       element.load();
     };
-  }, [source, retry]);
+  }, [effectiveSource, retry]);
   useEffect(() => {
     const changed = () =>
       setFullscreen(document.fullscreenElement === shell.current);
@@ -201,8 +243,19 @@ export default function MediaPlayer({
         Array.from(element.textTracks).flatMap((track, index) => track === uploadedTrackElement.current?.track ? [] : [{
           id: `native-${index}`,
           name: track.label || track.language || `Subtitles ${index + 1}`,
+          language: track.language,
         }]),
       );
+    try {
+      const preferred = localStorage.getItem("chanduflix_subtitle_language");
+      if (preferred && preferred !== "off" && !hlsRef.current?.subtitleTracks?.length) {
+        Array.from(element.textTracks).forEach((track, index) => {
+          if (track === uploadedTrackElement.current?.track) return;
+          track.mode = track.language === preferred ? "showing" : "disabled";
+          if (track.language === preferred) setCaption(`native-${index}`);
+        });
+      }
+    } catch { /* Captions remain selectable without local storage. */ }
     if (element.audioTracks?.length && audioOptions.length < 2)
       setInternalAudio(
         Array.from(element.audioTracks).map((track, index) => ({
@@ -275,6 +328,8 @@ export default function MediaPlayer({
   };
   const changeCaption = (value) => {
     setCaption(value);
+    const language = captions.find((track) => track.id === value)?.language;
+    if (value === "off" || language) storePreference("subtitle_language", value === "off" ? "off" : language);
     const hls = hlsRef.current;
     if (hls) {
       hls.subtitleTrack = value.startsWith("hls-")
@@ -315,7 +370,11 @@ export default function MediaPlayer({
       return;
     }
     setInternalAudioValue(value);
-    if (hlsRef.current) hlsRef.current.audioTrack = Number(value);
+    if (hlsRef.current) {
+      hlsRef.current.audioTrack = Number(value);
+      const language = hlsRef.current.audioTracks[Number(value)]?.lang;
+      if (language) storePreference("audio_language", language);
+    }
     else if (video.current.audioTracks)
       Array.from(video.current.audioTracks).forEach((track, index) => {
         track.enabled = index === Number(value);
@@ -494,7 +553,7 @@ export default function MediaPlayer({
           }}
           onError={handleMediaError}
         >
-          {(source.subtitles || []).map((track) => (
+          {(effectiveSource.subtitles || []).map((track) => (
             <track
               key={track.url}
               kind="subtitles"
@@ -736,7 +795,7 @@ export default function MediaPlayer({
                     ))}
                   </select>
                 </label>
-                {!availableCaptions.length && <p>This source has no subtitle track. Load an SRT or VTT file from your device below.</p>}
+                {!availableCaptions.length && <p>{["queued", "probing", "preparing"].includes(trackPreparation) ? "Preparing embedded language tracks for this title. Original playback remains available." : "No browser subtitle track is available. You can load an SRT or VTT file below."}</p>}
                 <label className="subtitle-file-label">
                   Load subtitle file
                   <input type="file" accept=".srt,.vtt,text/vtt,text/plain" onChange={loadSubtitleFile} />
@@ -744,6 +803,8 @@ export default function MediaPlayer({
               </>
             ) : (
               <>
+                {["queued", "probing", "preparing"].includes(trackPreparation) && <p>Preparing embedded audio and subtitles once for this title. Original playback remains available.</p>}
+                {trackPreparation === "unavailable" && <p>Embedded tracks could not be prepared. Original playback and local subtitle files remain available.</p>}
                 <label>
                   Playback speed
                   <select

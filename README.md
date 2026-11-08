@@ -38,7 +38,9 @@ The modified BoxOffice app (`com.fvvcl.flickverse.tv`) runs in the `boxoffice-ru
 
 Keyboard shortcuts: Space/K play or pause, left/right seek ten seconds, up/down adjust volume, M mute, F fullscreen, C captions. Focused player buttons support arrow-key navigation. Audio and subtitle menus reflect available sources and browser tracks; unavailable tracks are not fabricated. Embedded MP4 tracks that a browser does not expose cannot be selected there.
 
-Audio/subtitle options depend on the source metadata and browser support. The player can load a viewer-supplied SRT or VTT subtitle file locally; the file is not uploaded to the relay. Dubbed audio requires an alternate source or an exposed track.
+Embedded MP4 audio and text subtitles are discovered on Oracle with FFprobe, then prepared as an HLS video/audio bundle and WebVTT subtitles using FFmpeg. The video is copied without re-encoding; AAC audio is copied and other audio codecs are converted to AAC. Original playback stays available while preparation runs once for that source. The player then preserves position/play state and exposes the real embedded languages. Language selection is remembered in this browser. Text subtitle formats are supported; bitmap captions requiring OCR are not fabricated. Local SRT/VTT loading remains available.
+
+First preparation downloads and remuxes the complete source and can take several minutes. Prepared sources are cached on Oracle; normal viewing and seeking then use complete VOD playlists. The relay limits concurrent preparation to two jobs, checks temporary cache/disk use and evicts inactive cached sources. It needs `ffmpeg` and `ffprobe` on its PATH and a writable `TRACK_CACHE_DIR` (default `/var/lib/chanduflix/tracks`). The systemd deployment uses `StateDirectory=chanduflix` to keep writes scoped to that directory. All track metadata, playlists, segments and subtitle files require the existing signed playback ticket; the FFmpeg input bridge is loopback-only.
 
 ## Production relay and Vercel
 

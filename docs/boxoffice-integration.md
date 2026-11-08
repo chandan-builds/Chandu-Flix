@@ -1,5 +1,13 @@
 # Boxoffice integration evidence
 
+## Embedded-language investigation and implementation (8 November 2026)
+
+REA inspected the original APK and the exact audio/subtitle dialog methods. `VideoPlayDetailActivity.b.a(long)` enumerates ExoPlayer renderer track groups, reading `Format.B` language codes for audio renderer type 1 and text renderer type 3. `com.mgs.carparking.widgets.dialog.b` changes preferred audio/text languages on the same track selector, without requesting a new movie URL. Its language preferences are separate from the API's `audio_type` field. Readable source and full REA evidence are retained with this task's track-analysis report.
+
+Oracle probing of the actual Jailer MP4 found Tamil, Kannada, Malayalam, Telugu and Hindi AAC audio and an English `mov_text` subtitle stream, despite API metadata offering only Original. The website now prepares embedded tracks on demand as complete HLS audio renditions and WebVTT text. Preparation leaves the original MP4 available, with a visible status, and cached output preserves full-duration seeking. The player switches to prepared playback at its existing timestamp/play state and selects actual languages using HLS/browser track APIs. Subtitles have an explicit Off mode.
+
+The native SDK truncates large/open-ended responses, so FFmpeg reads through a private loopback adapter that assembles validated native byte ranges. Signed tickets restrict the public track endpoints to the selected media resource and matching cache identity. Cache limits, disk reserve checks, worker limits and inactivity eviction bound preparation work. This is an adaptation of the phone's embedded-track behavior, not a new provider or a change to native verification.
+
 ## Current runtime: BoxOffice (8 November 2026)
 
 The owner requested replacing DeepCine with the modified BoxOffice APK tested on their phone. The catalog adapter now sends `package_name=com.fvvcl.flickverse` and `version=50000`, matching that working client. The installed Android runtime package is `com.fvvcl.flickverse.tv`; these identities differ intentionally because the modified APK is a separately signed install.

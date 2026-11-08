@@ -159,6 +159,8 @@ export async function playbackRequest(query, sdkUrl = configuredSDK()) {
       if (!["http:", "https:"].includes(source.protocol)) return [];
       const type = item.vod_url.endsWith(".mp4") ? "mp4" : "hls";
       const path = `/resource.${type === "mp4" ? "mp4" : "m3u8"}?src=${Buffer.from(item.vod_url).toString("base64")}`;
+      const ticket = issueTicket(path);
+      const relayOrigin = process.env.BOXOFFICE_MEDIA_RELAY_URL;
       return [
         {
           id: Number(item.collection) || 1,
@@ -166,9 +168,10 @@ export async function playbackRequest(query, sdkUrl = configuredSDK()) {
           duration: item.duration || "",
           source: {
             type,
-            url: process.env.BOXOFFICE_MEDIA_RELAY_URL
-              ? `${new URL("/api/stream", process.env.BOXOFFICE_MEDIA_RELAY_URL)}?ticket=${issueTicket(path)}`
-              : `/api/stream?ticket=${issueTicket(path)}`,
+            url: relayOrigin
+              ? `${new URL("/api/stream", relayOrigin)}?ticket=${ticket}`
+              : `/api/stream?ticket=${ticket}`,
+            ...(type === "mp4" && relayOrigin ? { tracksUrl: `${new URL("/api/tracks", relayOrigin)}?ticket=${ticket}` } : {}),
           },
         },
       ];

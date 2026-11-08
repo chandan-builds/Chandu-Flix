@@ -1,6 +1,7 @@
 import http from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { configuredSDK, streamRequest } from "./playback.js";
+import { createEmbeddedTracks } from "./embeddedTracks.js";
 
 // Run alongside a reachable Android SDK runtime. This does not launch an APK,
 // publish a tunnel, change a phone, or expose a network port by default.
@@ -12,6 +13,7 @@ if (!sdkUrl || !accessToken || !process.env.PLAYBACK_SIGNING_SECRET) {
   );
 }
 const expected = Buffer.from(`Bearer ${accessToken}`);
+const embeddedTracks = createEmbeddedTracks({ sdkUrl, cacheDir: process.env.TRACK_CACHE_DIR || "/var/lib/chanduflix/tracks" });
 const server = http.createServer(async (req, res) => {
   const requestOrigin = req.headers.origin;
   if (
@@ -59,6 +61,7 @@ const server = http.createServer(async (req, res) => {
     await streamRequest(req, res, sdkUrl);
     return;
   }
+  if (await embeddedTracks(req, res, url)) return;
   if (url.pathname !== "/control" || req.method !== "GET") {
     res.statusCode = 404;
     res.end();
