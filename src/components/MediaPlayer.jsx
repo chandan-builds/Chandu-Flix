@@ -17,6 +17,7 @@ import {
 import { getProgress, saveProgress } from "../watchHistory";
 import { TMDB_IMAGE } from "../tmdb";
 import { subtitleAsVtt } from "../subtitles";
+import { startAutomatically } from "../autoplay";
 import "./MediaPlayer.css";
 
 const formatTime = (value) => {
@@ -57,7 +58,8 @@ export default function MediaPlayer({
     recoveryCount = useRef(0),
     recoveryPosition = useRef(null),
     resumeAfterRecovery = useRef(false),
-    uploadedTrackElement = useRef(null);
+    uploadedTrackElement = useRef(null),
+    autoplayAttempted = useRef(false);
   const [playing, setPlaying] = useState(false),
     [time, setTime] = useState(0),
     [duration, setDuration] = useState(0),
@@ -81,6 +83,7 @@ export default function MediaPlayer({
     [internalAudioValue, setInternalAudioValue] = useState("0");
   const [preparedSource, setPreparedSource] = useState(null),
     [trackPreparation, setTrackPreparation] = useState("");
+  const [autoplayMuted, setAutoplayMuted] = useState(false);
   const effectiveSource = preparedSource || source;
 
   useEffect(() => {
@@ -531,7 +534,17 @@ export default function MediaPlayer({
           }}
           onWaiting={() => setBuffering(true)}
           onStalled={() => setBuffering(true)}
-          onCanPlay={() => setBuffering(false)}
+          onCanPlay={() => {
+            setBuffering(false);
+            if (autoplayAttempted.current) return;
+            autoplayAttempted.current = true;
+            const element = video.current;
+            void startAutomatically(element).then((state) => {
+              if (state === "muted") { setMuted(true); setAutoplayMuted(true); }
+              if (state === "blocked") setNotice("Press play to start this video.");
+              if (state === "deferred") autoplayAttempted.current = false;
+            });
+          }}
           onPause={() => {
             setPlaying(false);
             setBuffering(false);
@@ -553,6 +566,7 @@ export default function MediaPlayer({
           onVolumeChange={() => {
             setVolume(video.current.volume);
             setMuted(video.current.muted);
+            if (!video.current.muted) setAutoplayMuted(false);
           }}
           onError={handleMediaError}
         >
@@ -601,6 +615,7 @@ export default function MediaPlayer({
           </button>
         )}
       </div>
+      {autoplayMuted && <button className="autoplay-sound" onClick={() => { video.current.muted = false; setMuted(false); setAutoplayMuted(false); }}><Volume2 size={17} /> Playing muted · Turn sound on</button>}
       <div className="player-controls" inert={!controlsShown}>
         <div className="player-timeline">
           <span>{formatTime(time)}</span>

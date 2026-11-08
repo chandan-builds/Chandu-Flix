@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import TitlePage from "./pages/TitlePage";
 import LibraryPage from "./pages/LibraryPage";
 import "./App.css";
+import "./reelipse-theme.css";
 function DetailRoute({ mediaType }) {
   const { id } = useParams();
   if (id?.startsWith("bo-")) return <LibraryPage key={id} />;

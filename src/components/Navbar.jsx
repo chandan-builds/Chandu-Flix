@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
-import { Clapperboard, Search } from "lucide-react";
+import { Orbit, Search } from "lucide-react";
 import "./Navbar.css";
 export default function Navbar() {
   const navigate = useNavigate();
@@ -26,9 +26,9 @@ export default function Navbar() {
     <nav className="site-nav" aria-label="Main navigation">
       <Link to="/" className="brand" aria-label="ChanduFlix home">
         <span className="brand-mark">
-          <Clapperboard size={22} />
+          <Orbit size={25} />
         </span>
-        CHANDU<span>FLIX</span>
+        Chandu<span>Flix</span>
       </Link>
       <div className="main-links">
         <NavLink to="/" end>

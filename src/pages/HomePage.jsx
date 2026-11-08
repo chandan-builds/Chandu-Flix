@@ -22,8 +22,8 @@ export default function HomePage() {
         <GenreChips />
         <ContinueWatching />
         <Row
-          title="Trending now"
-          subtitle="The stories everyone is talking about"
+          title="Popular in the library."
+          subtitle="Open a title and make yourself comfortable."
           fetchUrl={requests.fetchTrending}
           isLargeRow
         />

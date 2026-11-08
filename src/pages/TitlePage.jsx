@@ -17,7 +17,7 @@ export default function TitlePage({ mediaType }) {
   const episode = Math.max(1, Number(params.get("episode")) || 1);
   const [details, setDetails] = useState(null);
   const [failed, setFailed] = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
   const [episodes, setEpisodes] = useState([]);
   const [episodesError, setEpisodesError] = useState(false);
   useEffect(() => {
@@ -163,7 +163,7 @@ export default function TitlePage({ mediaType }) {
                 value={season}
                 onChange={(event) => {
                   setParams({ season: event.target.value, episode: "1" });
-                  setPlaying(false);
+                  setPlaying(true);
                 }}
               >
                 {seasons.map((item) => (
