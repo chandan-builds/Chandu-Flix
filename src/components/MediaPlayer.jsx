@@ -144,14 +144,15 @@ export default function MediaPlayer({
     )
       ? preference("speed", 1)
       : 1;
-    if (
-      effectiveSource.type === "hls" &&
-      !element.canPlayType("application/vnd.apple.mpegurl")
-    ) {
+    if (effectiveSource.type === "hls") {
       import("hls.js")
         .then(({ default: Hls }) => {
           if (!active) return;
           if (!Hls.isSupported()) {
+            if (element.canPlayType("application/vnd.apple.mpegurl")) {
+              element.src = effectiveSource.url;
+              return;
+            }
             setFailure("This browser cannot play this stream.");
             return;
           }
