@@ -73,3 +73,10 @@ body::before { background: none; }
 .watching-info details { max-width: 500px; padding: 12px 0; font-size: .8rem; color: #d0bb90; }
 .watching-info summary { cursor: pointer; min-height: 35px; }
 @media(max-width: 600px) { .watching-info { flex-direction: column; gap: 5px; } }
+.genre-chip:hover { background: #f5b94218; border-color: #f5b94260; box-shadow: 0 4px 16px #f5b94212; }
+.control-button.primary-control:hover { background: #ffd175; }
+.player-menu select, .player-episode-list button { background: #2a251d; border-color: #75644770; }
+.player-menu-header { background: #201c16; }
+.player-episode-list button.selected { border-color: #f5b942; background: #f5b94218; }
+.video-buffering .loading-spinner { border-top-color: #f5b942; }
+.row-retry-btn, .slider-arrow { background: #29241c; border-color: #75644770; }

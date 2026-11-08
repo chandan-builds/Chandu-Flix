@@ -213,7 +213,7 @@ export default function LibraryPage() {
                 </div>
               </section>
             )}
-            {playing && <section className="watching-info"><div><span className="eyebrow">NOW WATCHING</span><h1>{item.title}</h1><p>{item.media_type === "tv" ? "Series" : "Movie"} · {(item.release_date || item.first_air_date || "").slice(0, 4)}{item.language && ` · ${item.language}`}</p></div>{item.overview && <details><summary>About this title</summary><p>{item.overview}</p></details>}</section>}
+            {playing && <section className="watching-info"><div><span className="eyebrow">YOUR SELECTION</span><h1>{item.title}</h1><p>{item.media_type === "tv" ? "Series" : "Movie"} · {(item.release_date || item.first_air_date || "").slice(0, 4)}{item.language && ` · ${item.language}`}</p></div>{item.overview && <details><summary>About this title</summary><p>{item.overview}</p></details>}</section>}
             {result.audioOptions?.length > 1 && (
               <label className="season-label">
                 Audio{" "}
