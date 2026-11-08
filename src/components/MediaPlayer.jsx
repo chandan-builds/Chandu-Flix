@@ -97,7 +97,9 @@ export default function MediaPlayer({
         if (!active) return;
         setTrackPreparation(data.state);
         if (data.state === "ready" && data.source) {
-          recoveryPosition.current = video.current?.currentTime || 0;
+          recoveryPosition.current = video.current?.readyState > 0
+            ? video.current.currentTime
+            : getProgress(mediaType, id, season, episode);
           resumeAfterRecovery.current = Boolean(video.current && !video.current.paused);
           setPreparedSource({
             ...data.source,
@@ -113,7 +115,7 @@ export default function MediaPlayer({
     };
     void poll();
     return () => { active = false; clearTimeout(timer); controller.abort(); };
-  }, [source]);
+  }, [source, mediaType, id, season, episode]);
 
   const revealControls = () => {
     setControlsVisible(true);
