@@ -1,4 +1,5 @@
 const API = "https://api.thugtv.online/api/stream";
+const SITE_API = "https://thugtv.online/api/stream";
 const VELVET_API = "https://srv1.thugtv.online/api/stream/source";
 const CHANDU_ORIGIN = "https://chandu-flix.vercel.app";
 const VELVET_MEDIA = new Set([
@@ -52,21 +53,24 @@ async function resolveKnight(path, entries, signal) {
   return source?.url ? { ...source, name: "Knight", label: "Knight" } : null;
 }
 
-async function loadListing(url) {
-  try {
-    return await streamJson(url, AbortSignal.timeout(3500));
-  } catch (error) {
-    if (error.status && error.status < 500) throw error;
-    return streamJson(url, AbortSignal.timeout(4500));
+async function loadListing(path, imdb) {
+  for (const base of [API, SITE_API]) {
+    const url = new URL(`${base}/${path}`);
+    if (imdb) url.searchParams.set("imdb", imdb);
+    try {
+      const listing = await streamJson(url, AbortSignal.timeout(4000));
+      if (Array.isArray(listing?.sources)) return listing.sources;
+      if (listing !== null) throw new Error("Unexpected stream listing");
+    } catch (error) {
+      if (base === SITE_API) throw error;
+    }
   }
+  return [];
 }
 
 export async function loadThugTvSources(path, imdb) {
-  const url = new URL(`${API}/${path}`);
-  if (imdb) url.searchParams.set("imdb", imdb);
   const velvet = resolveVelvet(path, AbortSignal.timeout(4500)).catch(() => null);
-  const listing = await loadListing(url);
-  const entries = Array.isArray(listing?.sources) ? listing.sources : [];
+  const entries = await loadListing(path, imdb);
   const citadel = entries.filter((source) =>
     /^server-direct-castle(-tv)?$/.test(source?.id) && source.type === "hls",
   );
