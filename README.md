@@ -38,7 +38,7 @@ Movies, Series, and Search load TMDB metadata and page through results on demand
 
 The native player supports HLS, MP4 and WebM. A configured provider can supply multiple servers, quality variants and WebVTT subtitles. Iframe entries use the provider's controls, while Chandu-Flix keeps the server selector and player overlay available.
 
-By default, Chandu-Flix looks up fresh sources through ThugTV's public stream APIs for the exact TMDB title and episode. Citadel supplies HLS when available. Velvet and Knight appear only when their resolvers return a usable source. Availability depends on the upstream catalog, and failed lookups can be retried from the player.
+On Vercel, discovery titles first look for a unique BoxOffice catalog match by title, media type, release year, and season. Series playback selects the requested episode from that match. The existing Oracle relay supplies the signed stream. If no BoxOffice source resolves, Chandu-Flix tries ThugTV's public source API, where network access and title availability vary. A configured provider overrides this default selection.
 
 To override the default resolver with a source service you have access to, set `STREAM_PROVIDER_URL` on the Vite or Vercel server to its API base. The adapter appends `/movie/<tmdb-id>` or `/tv/<tmdb-id>/<season>/<episode>` and includes an IMDb ID when available. Set `STREAM_PROVIDER_TOKEN` if the service accepts bearer authentication. The service must return resolved HTTPS URLs as `{ "sources": [...] }`; unresolved entries are omitted. Supported source types are `hls`, `mp4`, `webm`, and `embed`. Entries can include `name`, `quality`, `qualityVariants` (objects with `label` and `url`), and `subtitles` (objects with `label`, `language` or `lang`, and `url`).
 

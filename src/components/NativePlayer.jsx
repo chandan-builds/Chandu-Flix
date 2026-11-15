@@ -7,7 +7,7 @@ export default function NativePlayer({ source, ...props }) {
   return <DiscoveredPlayer key={JSON.stringify([props.mediaType, props.id, props.season, props.episode])} {...props} />;
 }
 
-function DiscoveredPlayer({ mediaType, id, season, episode, imdbId, ...props }) {
+function DiscoveredPlayer({ mediaType, id, season, episode, imdbId, releaseYear, title, ...props }) {
   const [result, setResult] = useState({ loading: true, sources: [] });
   const [selected, setSelected] = useState(0);
   const [attempt, setAttempt] = useState(0);
@@ -16,6 +16,10 @@ function DiscoveredPlayer({ mediaType, id, season, episode, imdbId, ...props }) 
     const controller = new AbortController();
     const query = new URLSearchParams({ type: mediaType, id, season, episode });
     if (imdbId) query.set("imdb", imdbId);
+    if (title && releaseYear) {
+      query.set("title", title);
+      query.set("year", releaseYear);
+    }
     const remote = fetch(`/api/sources?${query}`, { signal: controller.signal }).then((response) => {
       if (!response.ok) throw new Error("Stream provider unavailable");
       return response.json();
@@ -31,7 +35,7 @@ function DiscoveredPlayer({ mediaType, id, season, episode, imdbId, ...props }) 
         setResult({ sources, error: local.status === "rejected" || provider.status === "rejected" });
       });
     return () => controller.abort();
-  }, [mediaType, id, season, episode, imdbId, attempt]);
+  }, [mediaType, id, season, episode, imdbId, title, releaseYear, attempt]);
 
   const reload = () => {
     setSelected(0);
@@ -66,7 +70,7 @@ function DiscoveredPlayer({ mediaType, id, season, episode, imdbId, ...props }) 
         <iframe
           key={media.url}
           src={media.url}
-          title={`${props.title} on ${media.name}`}
+          title={`${title} on ${media.name}`}
           allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
           allowFullScreen
           referrerPolicy="no-referrer"
@@ -78,6 +82,7 @@ function DiscoveredPlayer({ mediaType, id, season, episode, imdbId, ...props }) 
   return <MediaPlayer
     key={media.url}
     source={media}
+    title={title}
     mediaType={mediaType}
     id={id}
     season={season}

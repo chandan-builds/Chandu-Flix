@@ -1,5 +1,7 @@
 import { normalizeMedia } from "../src/mediaLibrary.js";
 import { loadThugTvSources } from "./thugtvSources.js";
+import { configuredSDK } from "./playback.js";
+import { resolveBoxOfficeSource } from "./boxofficeSources.js";
 
 const validId = (value) => /^[1-9]\d{0,9}$/.test(value || "");
 const safeUrl = (value) => {
@@ -25,6 +27,17 @@ export async function resolveSources(query, provider = process.env.STREAM_PROVID
   const path = type === "tv" ? `tv/${id}/${season}/${episode}` : `movie/${id}`;
   const imdb = query.get("imdb");
   const imdbId = /^tt\d+$/.test(imdb || "") ? imdb : null;
+  if (!provider) {
+    const boxOffice = await resolveBoxOfficeSource({
+      type,
+      season,
+      episode,
+      title: query.get("title")?.trim(),
+      year: query.get("year"),
+    }, configuredSDK()).catch(() => null);
+    if (boxOffice) return [boxOffice];
+  }
+
   const sources = provider
     ? await loadConfiguredSources(provider, path, imdbId)
     : await loadThugTvSources(path, imdbId);

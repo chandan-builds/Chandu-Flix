@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { issueTicket, verifyTicket, playbackRequest, limitMediaRange, fetchCompleteMp4Chunk } from "./playback.js";
 import { normalizeTitle, readCatalog } from "./boxoffice.js";
+import { matchBoxOfficeTitle } from "./boxofficeSources.js";
 import { createCipheriv } from "node:crypto";
 
 test("catalog requests use the working BoxOffice API identity", async (t) => {
@@ -78,4 +79,18 @@ test("movie and season catalog records retain their source identities and media 
     "tv",
   );
   assert.equal(normalizeTitle({ id: -2, vod_name: "Invalid" }), null);
+});
+
+test("catalog matching keeps remakes and different seasons out of discovery playback", () => {
+  const original = { title: "Fight Club", release_date: "1999-01-01", media_type: "movie" };
+  const remake = { ...original, release_date: "2023-01-01" };
+  const movie = { title: "Fight Club", year: "1999", type: "movie" };
+  assert.equal(matchBoxOfficeTitle([remake, original], movie), original);
+  assert.equal(matchBoxOfficeTitle([original, { ...original }], movie), null);
+
+  const seasonOne = { title: "Example — Season 1", first_air_date: "2024-01-01", media_type: "tv" };
+  const seasonTwo = { ...seasonOne, title: "Example — Season 2" };
+  const show = { title: "Example", year: "2024", type: "tv", season: "2" };
+  assert.equal(matchBoxOfficeTitle([seasonOne, seasonTwo], show), seasonTwo);
+  assert.equal(matchBoxOfficeTitle([seasonOne], show), null);
 });

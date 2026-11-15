@@ -87,6 +87,10 @@ export default function TitlePage({ mediaType }) {
   const current = episodes.find((item) => item.episode_number === episode);
   const seasons =
     details.seasons?.filter((item) => item.season_number > 0) || [];
+  const releaseYear = (mediaType === "tv"
+    ? seasons.find((item) => item.season_number === season)?.air_date
+    : details.release_date
+  )?.slice(0, 4);
   return (
     <main className="detail-page">
       <Link
@@ -114,6 +118,7 @@ export default function TitlePage({ mediaType }) {
             season={season}
             episode={episode}
             imdbId={details.external_ids?.imdb_id || details.imdb_id}
+            releaseYear={releaseYear}
             title={title}
             poster_path={details.poster_path}
             backdrop_path={details.backdrop_path}
