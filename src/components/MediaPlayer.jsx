@@ -480,7 +480,7 @@ export default function MediaPlayer({
   const availableCaptions = uploadedTrack
     ? [...captions, { id: "uploaded", name: `Local: ${uploadedTrack.name}` }]
     : captions;
-  const controlsShown = !playing || Boolean(menu) || controlsVisible;
+  const controlsShown = buffering || !playing || Boolean(menu) || controlsVisible;
   const serverPicker = servers.length > 1 && (
     <label>
       Server and quality
