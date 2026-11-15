@@ -1,4 +1,5 @@
 import { normalizeMedia } from "../src/mediaLibrary.js";
+import { loadThugTvSources } from "./thugtvSources.js";
 
 const validId = (value) => /^[1-9]\d{0,9}$/.test(value || "");
 const safeUrl = (value) => {
@@ -21,29 +22,18 @@ export async function resolveSources(query, provider = process.env.STREAM_PROVID
       (type === "tv" && (!validId(season) || !validId(episode)))) {
     throw Object.assign(new Error("Invalid title or episode"), { status: 400 });
   }
-  if (!provider) return [];
-
-  const url = new URL(provider);
-  if (!["http:", "https:"].includes(url.protocol)) throw new Error("Invalid provider URL");
-  url.pathname = url.pathname.replace(/\/$/, "") +
-    (type === "tv" ? `/tv/${id}/${season}/${episode}` : `/movie/${id}`);
+  const path = type === "tv" ? `tv/${id}/${season}/${episode}` : `movie/${id}`;
   const imdb = query.get("imdb");
-  if (/^tt\d+$/.test(imdb || "")) url.searchParams.set("imdb", imdb);
-  const token = process.env.STREAM_PROVIDER_TOKEN;
-  const response = await fetch(url, {
-    headers: { Accept: "application/json", ...(token && { Authorization: `Bearer ${token}` }) },
-    signal: AbortSignal.timeout(8000),
-    redirect: "error",
-  });
-  if (response.status === 404) return [];
-  if (!response.ok) throw new Error("Stream provider unavailable");
+  const imdbId = /^tt\d+$/.test(imdb || "") ? imdb : null;
+  const sources = provider
+    ? await loadConfiguredSources(provider, path, imdbId)
+    : await loadThugTvSources(path, imdbId);
 
   const embedOrigins = new Set((process.env.STREAM_EMBED_ORIGINS || "")
     .split(",")
     .map((value) => safeUrl(value.trim()))
     .filter(Boolean)
     .map((value) => new URL(value).origin));
-  const { sources } = await response.json();
   if (!Array.isArray(sources)) throw new Error("Invalid stream provider response");
   return sources.slice(0, 30).flatMap((item, index) => {
     if (!item || typeof item !== "object") return [];
@@ -75,6 +65,23 @@ export async function resolveSources(query, provider = process.env.STREAM_PROVID
       }),
     ];
   }).filter((source, index, list) => list.findIndex((other) => other.url === source.url) === index);
+}
+
+async function loadConfiguredSources(provider, path, imdb) {
+  const url = new URL(provider);
+  if (!["http:", "https:"].includes(url.protocol)) throw new Error("Invalid provider URL");
+  url.pathname = `${url.pathname.replace(/\/$/, "")}/${path}`;
+  if (imdb) url.searchParams.set("imdb", imdb);
+  const token = process.env.STREAM_PROVIDER_TOKEN;
+  const response = await fetch(url, {
+    headers: { Accept: "application/json", ...(token && { Authorization: `Bearer ${token}` }) },
+    signal: AbortSignal.timeout(8000),
+    redirect: "error",
+  });
+  if (response.status === 404) return [];
+  if (!response.ok) throw new Error("Stream provider unavailable");
+  const { sources } = await response.json();
+  return sources;
 }
 
 export async function sourceRequest(req, res) {
