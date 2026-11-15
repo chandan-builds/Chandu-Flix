@@ -107,14 +107,14 @@ export const TV_GENRES = [
 
 export async function fetchMovieDetails(id) {
   const res = await catalogFetch(
-    `${BASE_URL}/movie/${id}?api_key=${API_KEY}&append_to_response=credits,similar,videos`,
+    `${BASE_URL}/movie/${id}?api_key=${API_KEY}&append_to_response=credits,similar,videos,external_ids`,
   );
   return res.json();
 }
 
 export async function fetchTvDetails(id) {
   const res = await catalogFetch(
-    `${BASE_URL}/tv/${id}?api_key=${API_KEY}&append_to_response=credits,similar,videos`,
+    `${BASE_URL}/tv/${id}?api_key=${API_KEY}&append_to_response=credits,similar,videos,external_ids`,
   );
   return res.json();
 }
@@ -126,9 +126,11 @@ export async function fetchTvSeason(tvId, seasonNum) {
   return res.json();
 }
 
-export async function searchMulti(query) {
+export async function searchMulti(query, { type = "all", page = 1, signal } = {}) {
+  const endpoint = type === "movie" || type === "tv" ? type : "multi";
   const res = await catalogFetch(
-    `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=en-US&page=1`,
+    `${BASE_URL}/search/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=en-US&include_adult=false&page=${page}`,
+    { signal },
   );
   return res.json();
 }

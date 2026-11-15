@@ -13,6 +13,7 @@ import {
   PictureInPicture2,
   ListVideo,
   SkipForward,
+  Server,
 } from "lucide-react";
 import { getProgress, saveProgress } from "../watchHistory";
 import { TMDB_IMAGE } from "../tmdb";
@@ -48,6 +49,10 @@ export default function MediaPlayer({
   episodes = [],
   episodeValue,
   onEpisodeChange,
+  servers = [],
+  serverValue = 0,
+  onServerChange,
+  onRefreshSources,
 }) {
   const video = useRef(null),
     shell = useRef(null),
@@ -476,14 +481,31 @@ export default function MediaPlayer({
     ? [...captions, { id: "uploaded", name: `Local: ${uploadedTrack.name}` }]
     : captions;
   const controlsShown = !playing || Boolean(menu) || controlsVisible;
+  const serverPicker = servers.length > 1 && (
+    <label>
+      Server and quality
+      <select value={serverValue} onChange={(event) => {
+        persist(true);
+        onServerChange(Number(event.target.value));
+      }}>
+        {servers.map((server, index) => (
+          <option key={server.url} value={index}>
+            {server.name}{server.quality ? ` · ${server.quality}` : ""}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
   if (failure)
     return (
       <div className="player-empty" role="alert">
         <h2>Playback unavailable</h2>
         <p>{failure}</p>
+        {serverPicker}
         <button
           className="primary-button"
           onClick={() => {
+            if (onRefreshSources) return onRefreshSources();
             setFailure("");
             recoveryCount.current = 0;
             recoveryPosition.current = null;
@@ -708,6 +730,16 @@ export default function MediaPlayer({
             />
           </div>
           <div className="player-tools">
+            {servers.length > 1 && (
+              <button
+                className="control-button"
+                aria-label="Servers"
+                aria-expanded={menu === "servers"}
+                onClick={() => setMenu(menu === "servers" ? null : "servers")}
+              >
+                <Server size={21} />
+              </button>
+            )}
             {episodes.length > 1 && (
               <button
                 className={`control-button ${menu === "episodes" ? "selected" : ""}`}
@@ -758,7 +790,7 @@ export default function MediaPlayer({
             className="player-menu"
             role="region"
             aria-label={
-              menu === "episodes"
+              menu === "servers" ? "Servers" : menu === "episodes"
                 ? "Episodes"
                 : menu === "subtitles"
                   ? "Subtitle settings"
@@ -767,7 +799,7 @@ export default function MediaPlayer({
           >
             <div className="player-menu-heading">
               <strong>
-                {menu === "episodes"
+                {menu === "servers" ? "Servers" : menu === "episodes"
                   ? "Episodes"
                   : menu === "subtitles"
                     ? "Subtitles"
@@ -781,7 +813,7 @@ export default function MediaPlayer({
                 Done
               </button>
             </div>
-            {menu === "episodes" ? (
+            {menu === "servers" ? serverPicker : menu === "episodes" ? (
               <div className="player-episode-list">
                 {episodes.map((item) => (
                   <button

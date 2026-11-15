@@ -1,7 +1,10 @@
 export function selectMedia(library, { mediaType, id, season, episode }) {
   const key =
     mediaType === "tv" ? `tv:${id}:${season}:${episode}` : `movie:${id}`;
-  const media = library?.[key];
+  return normalizeMedia(library?.[key]);
+}
+
+export function normalizeMedia(media) {
   if (!media || !["mp4", "hls", "webm"].includes(media.type)) return null;
   try {
     if (new URL(media.url).protocol !== "https:") return null;

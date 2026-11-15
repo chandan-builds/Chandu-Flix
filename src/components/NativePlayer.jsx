@@ -1,40 +1,91 @@
 import { useEffect, useState } from "react";
 import { findMedia } from "../mediaLibrary";
 import MediaPlayer from "./MediaPlayer";
+
 export default function NativePlayer({ source, ...props }) {
-  const { mediaType, id, season, episode } = props;
-  const [result, setResult] = useState({ loading: true });
+  if (source) return <MediaPlayer key={source.url} source={source} {...props} />;
+  return <DiscoveredPlayer key={JSON.stringify([props.mediaType, props.id, props.season, props.episode])} {...props} />;
+}
+
+function DiscoveredPlayer({ mediaType, id, season, episode, imdbId, ...props }) {
+  const [result, setResult] = useState({ loading: true, sources: [] });
+  const [selected, setSelected] = useState(0);
+  const [attempt, setAttempt] = useState(0);
+
   useEffect(() => {
-    if (source) return;
     const controller = new AbortController();
-    findMedia({ mediaType, id, season, episode }, controller.signal)
-      .then((media) => setResult({ media }))
-      .catch((error) => {
-        if (error.name !== "AbortError")
-          setResult({
-            error: "The video library is unavailable. Please try again later.",
-          });
+    const query = new URLSearchParams({ type: mediaType, id, season, episode });
+    if (imdbId) query.set("imdb", imdbId);
+    const remote = fetch(`/api/sources?${query}`, { signal: controller.signal }).then((response) => {
+      if (!response.ok) throw new Error("Stream provider unavailable");
+      return response.json();
+    });
+    Promise.allSettled([findMedia({ mediaType, id, season, episode }, controller.signal), remote])
+      .then(([local, provider]) => {
+        if (controller.signal.aborted) return;
+        const sources = [];
+        if (local.status === "fulfilled" && local.value)
+          sources.push({ ...local.value, name: local.value.name || "My library" });
+        if (provider.status === "fulfilled")
+          sources.push(...provider.value.sources.filter((item) => !sources.some((existing) => existing.url === item.url)));
+        setResult({ sources, error: local.status === "rejected" || provider.status === "rejected" });
       });
     return () => controller.abort();
-  }, [source, mediaType, id, season, episode]);
-  const media = source || result.media;
-  if (!source && result.loading)
-    return (
-      <div className="player-empty" role="status">
+  }, [mediaType, id, season, episode, imdbId, attempt]);
+
+  const reload = () => {
+    setSelected(0);
+    setResult({ loading: true, sources: [] });
+    setAttempt((value) => value + 1);
+  };
+  const media = result.sources[selected];
+  if (!media) return (
+    <div className="player-empty" role="status">
+      {result.loading ? <>
         <div className="loading-spinner" />
-        <p>Loading your video…</p>
-      </div>
-    );
-  if (!media)
+        <p>Finding video sources…</p>
+      </> : <>
+        <h2>{result.error ? "Unable to check stream availability" : "No stream available for this title"}</h2>
+        {result.error && <button className="primary-button" onClick={reload}>Try again</button>}
+      </>}
+    </div>
+  );
+  if (media.type === "embed") {
     return (
-      <div className="player-empty" role="status">
-        <span className="eyebrow">CHANDUFLIX CINEMA</span>
-        <h2>Not available to stream yet</h2>
-        <p>
-          {result.error ||
-            "This title is in the discovery catalog. A video source has not been added to the library yet."}
-        </p>
-      </div>
+      <section className="embed-player" aria-label="Embedded video player">
+        <label>
+          Server
+          <select value={selected} onChange={(event) => setSelected(Number(event.target.value))}>
+            {result.sources.map((source, index) => (
+              <option key={source.url} value={index}>
+                {source.name}{source.quality ? ` · ${source.quality}` : ""}
+              </option>
+            ))}
+          </select>
+        </label>
+        <iframe
+          key={media.url}
+          src={media.url}
+          title={`${props.title} on ${media.name}`}
+          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+          allowFullScreen
+          referrerPolicy="no-referrer"
+          sandbox="allow-scripts allow-same-origin allow-presentation"
+        />
+      </section>
     );
-  return <MediaPlayer key={media.url} source={media} {...props} />;
+  }
+  return <MediaPlayer
+    key={media.url}
+    source={media}
+    mediaType={mediaType}
+    id={id}
+    season={season}
+    episode={episode}
+    servers={result.sources}
+    serverValue={selected}
+    onServerChange={setSelected}
+    onRefreshSources={reload}
+    {...props}
+  />;
 }

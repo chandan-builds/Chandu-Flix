@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { searchMulti, TMDB_IMAGE } from "../tmdb";
 import "./SearchPage.css";
@@ -10,42 +10,14 @@ const SearchPage = () => {
   const query = searchParams.get("q") || "";
   const typeFilter = searchParams.get("type") || "all";
 
-  const [results, setResults] = useState([]);
-  const [inputValue, setInputValue] = useState(query);
-  const [loading, setLoading] = useState(!!query);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    if (!query) return;
-
-    Promise.resolve().then(() => setLoading(true));
-    searchMulti(query)
-      .then((data) => {
-        let items = (data.results || []).filter(
-          (r) => r.media_type === "movie" || r.media_type === "tv",
-        );
-        if (typeFilter === "movie")
-          items = items.filter((r) => r.media_type === "movie");
-        if (typeFilter === "tv")
-          items = items.filter((r) => r.media_type === "tv");
-        setResults(items);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [query, typeFilter]);
+  const [draft, setDraft] = useState({ query, value: query });
+  const inputValue = draft.query === query ? draft.value : query;
+  const key = JSON.stringify([query, typeFilter]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (inputValue.trim().length >= 2) {
       navigate(`/search?q=${encodeURIComponent(inputValue.trim())}`);
-    }
-  };
-
-  const handleCardClick = (item) => {
-    if (item.media_type === "tv") {
-      navigate(`/tv/${item.id}`);
-    } else {
-      navigate(`/movie/${item.id}`);
     }
   };
 
@@ -59,7 +31,7 @@ const SearchPage = () => {
             type="text"
             placeholder="Search movies and TV shows..."
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => setDraft({ query, value: e.target.value })}
             className="search-page-input"
             autoFocus
           />
@@ -93,33 +65,62 @@ const SearchPage = () => {
         )}
       </div>
 
-      {/* Results */}
-      {loading ? (
-        <div className="search-loading">
-          <div className="loading-spinner" />
-        </div>
-      ) : !query ? (
+      {query ? <Results key={key} query={query} type={typeFilter} /> : (
         <div className="search-empty">
-          <h2>Browse Content</h2>
-          <p>Search for your favorite movies and TV shows</p>
+          <h2>Search movies and series</h2>
         </div>
-      ) : results.length === 0 ? (
-        <div className="search-empty">
-          <h2>No results for "{query}"</h2>
-          <p>Try different keywords</p>
-        </div>
-      ) : (
+      )}
+    </div>
+  );
+};
+
+function Results({ query, type }) {
+  const [result, setResult] = useState({ items: [], page: 0, total: 1 });
+  const [page, setPage] = useState(1);
+  const [retry, setRetry] = useState(0);
+  const loading = result.page < page && !result.error;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    searchMulti(query, { type, page, signal: controller.signal })
+      .then((data) => {
+        if (controller.signal.aborted) return;
+        const incoming = (data.results || []).flatMap((item) => {
+          const mediaType = type === "all" ? item.media_type : type;
+          return ["movie", "tv"].includes(mediaType) ? [{ ...item, media_type: mediaType }] : [];
+        });
+        setResult((previous) => ({
+          items: [...new Map([...previous.items, ...incoming].map((item) => [`${item.media_type}:${item.id}`, item])).values()],
+          page,
+          total: Math.min(data.total_pages || 1, 500),
+        }));
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setResult((previous) => ({ ...previous, error: true }));
+      });
+    return () => controller.abort();
+  }, [query, type, page, retry]);
+
+  const results = result.items;
+  return (
+    <>
+      {result.error && <div className="row-error" role="alert">
+        <p>Search results could not be loaded.</p>
+        <button className="row-retry-btn" onClick={() => {
+          setResult((current) => ({ ...current, error: false }));
+          setRetry((value) => value + 1);
+        }}>Try again</button>
+      </div>}
+      {!result.error && !loading && !results.length && (
+        <div className="search-empty"><h2>No results for “{query}”</h2></div>
+      )}
+      {results.length > 0 && (
         <div className="search-results-grid">
           {results.map((item) => (
-            <div
-              key={item.id}
+            <Link
+              key={`${item.media_type}:${item.id}`}
               className="search-result-card"
-              role="link"
-              tabIndex={0}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") event.currentTarget.click();
-              }}
-              onClick={() => handleCardClick(item)}
+              to={`/${item.media_type}/${item.id}`}
             >
               {item.poster_path || item.backdrop_path ? (
                 <img
@@ -154,12 +155,18 @@ const SearchPage = () => {
                   </span>
                 )}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
-    </div>
+      {loading && <div className="search-loading" role="status" aria-label="Loading results"><div className="loading-spinner" /></div>}
+      {!loading && !result.error && result.page < result.total && (
+        <div className="browse-load-more">
+          <button className="browse-load-more-btn" onClick={() => setPage((value) => value + 1)}>Load more</button>
+        </div>
+      )}
+    </>
   );
-};
+}
 
 export default SearchPage;

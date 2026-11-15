@@ -2,9 +2,11 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { catalogRequest } from "./server/boxoffice.js";
 import { playbackRequest, streamRequest } from "./server/playback.js";
+import { sourceRequest } from "./server/sources.js";
 const catalogPlugin = {
   name: "local-catalog-api",
   configureServer(server) {
+    server.middlewares.use("/api/sources", sourceRequest);
     const sdkUrl = process.env.BOXOFFICE_SDK_URL || "http://127.0.0.1:17000";
     server.middlewares.use("/api/stream", (req, res) =>
       streamRequest(req, res, sdkUrl),

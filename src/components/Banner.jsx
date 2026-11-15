@@ -48,7 +48,7 @@ export default function Banner() {
           <div className="hero-suggestions">
             <Link to="/movies">Movie night <ArrowUpRight size={13} /></Link>
             <Link to="/tv-shows">One more episode</Link>
-            <Link to="/movies?genre=Comedy">Something funny</Link>
+            <Link to="/movies?genre=35">Something funny</Link>
           </div>
         </div>
         <span className="orbit-caption">CHANDUFLIX · YOUR OWN LITTLE CINEMA</span>
@@ -69,7 +69,7 @@ export default function Banner() {
             <h3>{movie.title || movie.name}</h3>
             <p className="spotlight-meta">{(movie.release_date || movie.first_air_date || "").slice(0, 4)} <span>·</span> {movie.media_type === "tv" ? "Series" : "Movie"}{movie.vote_average > 0 && <> <span>·</span> <Star size={13} fill="currentColor" /> {movie.vote_average.toFixed(1)}</>}</p>
             <p className="spotlight-overview">{movie.overview || "Explore this title in the streaming library."}</p>
-            <Link className="primary-button" to={`/search?${new URLSearchParams({ q: movie.title || movie.name })}`}>Find in library <ArrowUpRight size={17} /></Link>
+            <Link className="primary-button" to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.id}`}>View title <ArrowUpRight size={17} /></Link>
           </div>
         </> : <div className="discovery-status" role="status"><p>{result.loading ? "Bringing the posters into focus…" : "Discovery is unavailable. Your streaming library is still below."}</p>{result.error && <button className="primary-button" onClick={() => setRetry((value) => value + 1)}>Retry discovery</button>}{!result.loading && !result.error && <Link to="/library">Browse the library</Link>}</div>}
       </section>

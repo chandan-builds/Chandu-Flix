@@ -3,6 +3,8 @@ import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import TitlePage from "./pages/TitlePage";
 import LibraryPage from "./pages/LibraryPage";
+import BrowsePage from "./pages/BrowsePage";
+import SearchPage from "./pages/SearchPage";
 import "./App.css";
 import "./reelipse-theme.css";
 function DetailRoute({ mediaType }) {
@@ -29,11 +31,11 @@ export default function App() {
             element={<DetailRoute mediaType="movie" />}
           />
           <Route path="/tv/:id" element={<DetailRoute mediaType="tv" />} />
-          <Route path="/search" element={<LibraryPage key="search" />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/library" element={<LibraryPage key="library" />} />
           <Route path="/library/:id" element={<LibraryDetailRoute />} />
-          <Route path="/movies" element={<LibraryPage key="movies" />} />
-          <Route path="/tv-shows" element={<LibraryPage key="tv" />} />
+          <Route path="/movies" element={<BrowsePage />} />
+          <Route path="/tv-shows" element={<BrowsePage />} />
           <Route
             path="*"
             element={
@@ -58,6 +60,7 @@ export default function App() {
           <Link to="/movies">Movies</Link>
           <Link to="/tv-shows">Series</Link>
           <Link to="/search">Search</Link>
+          <Link to="/library">BoxOffice library</Link>
         </div>
         <div className="footer-fine">
           <span>© {new Date().getFullYear()} ChanduFlix</span>

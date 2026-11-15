@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Play, Star, Clock } from "lucide-react";
+import { ArrowLeft, Play, Star, Clock, X } from "lucide-react";
 import {
   fetchMovieDetails,
   fetchTvDetails,
@@ -17,7 +17,14 @@ export default function TitlePage({ mediaType }) {
   const episode = Math.max(1, Number(params.get("episode")) || 1);
   const [details, setDetails] = useState(null);
   const [failed, setFailed] = useState(false);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
+  const watchDialog = useRef(null);
+  useEffect(() => {
+    if (!playing) return;
+    const dialog = watchDialog.current;
+    dialog.showModal();
+    return () => dialog.close();
+  }, [playing]);
   const [episodes, setEpisodes] = useState([]);
   const [episodesError, setEpisodesError] = useState(false);
   useEffect(() => {
@@ -88,20 +95,38 @@ export default function TitlePage({ mediaType }) {
       >
         <ArrowLeft size={18} /> Back to explore
       </Link>
-      {playing ? (
-        <NativePlayer
-          key={`${mediaType}:${id}:${season}:${episode}`}
-          mediaType={mediaType}
-          id={id}
-          season={season}
-          episode={episode}
-          title={
-            mediaType === "tv" ? `${title} · S${season} E${episode}` : title
-          }
-          poster_path={details.poster_path}
-          backdrop_path={details.backdrop_path}
-        />
-      ) : (
+      {playing && (
+        <dialog
+          className="watch-dialog"
+          ref={watchDialog}
+          aria-label={`Watch ${title}`}
+          onCancel={() => setPlaying(false)}
+        >
+          <header className="watch-dialog-header">
+            <h2>{title}{mediaType === "tv" ? ` · S${season} E${episode}` : ""}</h2>
+            <button className="control-button" aria-label="Close player" onClick={() => setPlaying(false)}>
+              <X size={24} />
+            </button>
+          </header>
+          <NativePlayer
+            mediaType={mediaType}
+            id={id}
+            season={season}
+            episode={episode}
+            imdbId={details.external_ids?.imdb_id || details.imdb_id}
+            title={title}
+            poster_path={details.poster_path}
+            backdrop_path={details.backdrop_path}
+            episodes={episodes.map((item) => ({
+              id: item.episode_number,
+              title: `${item.episode_number} · ${item.name}`,
+              duration: item.runtime ? `${item.runtime} min` : "",
+            }))}
+            episodeValue={episode}
+            onEpisodeChange={(value) => setParams({ season: String(season), episode: String(value) })}
+          />
+        </dialog>
+      )}
         <section
           className="detail-hero"
           style={{
@@ -149,7 +174,6 @@ export default function TitlePage({ mediaType }) {
             </button>
           </div>
         </section>
-      )}
       {mediaType === "tv" && (
         <section className="detail-section">
           <div className="section-heading">
@@ -163,7 +187,6 @@ export default function TitlePage({ mediaType }) {
                 value={season}
                 onChange={(event) => {
                   setParams({ season: event.target.value, episode: "1" });
-                  setPlaying(true);
                 }}
               >
                 {seasons.map((item) => (
@@ -198,7 +221,6 @@ export default function TitlePage({ mediaType }) {
                     episode: String(item.episode_number),
                   });
                   setPlaying(true);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               >
                 {item.still_path && (

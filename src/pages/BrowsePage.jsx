@@ -119,7 +119,10 @@ function Collection({ isTV, genre, region, sort }) {
           <button
             className="browse-load-more-btn"
             disabled={page > result.page && !result.error}
-            onClick={() => setPage((value) => value + 1)}
+            onClick={() => {
+              if (result.error && page > result.page) setRetry((value) => value + 1);
+              else setPage((value) => value + 1);
+            }}
           >
             {page > result.page && !result.error ? "Loading…" : "Load more"}
           </button>

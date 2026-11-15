@@ -294,3 +294,5 @@
     font-size: 0.65rem;
   }
 }
+
+.search-result-card { color: inherit; text-decoration: none; }

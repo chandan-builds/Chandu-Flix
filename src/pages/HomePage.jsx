@@ -4,7 +4,7 @@ import Banner from "../components/Banner";
 import Row from "../components/Row";
 import ContinueWatching from "../components/ContinueWatching";
 import GenreChips from "../components/GenreChips";
-import requests from "../libraryRequests";
+import requests from "../tmdb";
 export default function HomePage() {
   return (
     <main>
@@ -22,14 +22,12 @@ export default function HomePage() {
         <GenreChips />
         <ContinueWatching />
         <Row
-          title="Popular in the library."
-          subtitle="Open a title and make yourself comfortable."
+          title="Trending now"
           fetchUrl={requests.fetchTrending}
           isLargeRow
         />
         <Row
-          title="Made for a movie night"
-          subtitle="Big stories. Lasting impressions."
+          title="Top rated movies"
           fetchUrl={requests.fetchTopRated}
         />
         <div className="series-callout">
@@ -55,24 +53,20 @@ export default function HomePage() {
           </div>
         </div>
         <Row
-          title="Series to get lost in"
-          subtitle="Find a new favorite"
+          title="Trending series"
           fetchUrl={requests.fetchTrendingTV}
           isLargeRow
         />
         <Row
-          title="More to discover"
-          subtitle="Find something unexpected"
+          title="Bollywood"
           fetchUrl={requests.fetchBollywood}
         />
         <Row
-          title="A little more adrenaline"
-          subtitle="Action & adventure"
+          title="Action movies"
           fetchUrl={requests.fetchActionMovies}
         />
         <Row
-          title="A world beyond ordinary"
-          subtitle="Animation & imagination"
+          title="Anime"
           fetchUrl={requests.fetchAnime}
           isLargeRow
         />

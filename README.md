@@ -1,6 +1,6 @@
 # Chandu-Flix
 
-A responsive React/Vite cinema using the BoxOffice Android media service and a compatible catalog adapter for native MP4/HLS playback. The catalog uses BoxOffice's working API version `50000`.
+A React/Vite cinema with a paginated TMDB discovery catalog, native HLS/MP4 playback, optional embedded players, and a separate BoxOffice library at `/library`.
 
 ## Features
 
@@ -31,6 +31,16 @@ npm run dev
 ```
 
 3. Open your browser and navigate to `http://localhost:5173`.
+
+## Catalog and additional playback sources
+
+Movies, Series, and Search load TMDB metadata and page through results on demand. A catalog entry can be visible even when none of the configured sources has that title or episode.
+
+The native player supports HLS, MP4 and WebM. A configured provider can supply multiple servers, quality variants and WebVTT subtitles. Iframe entries use the provider's controls, while Chandu-Flix keeps the server selector and player overlay available.
+
+To connect a source service you have access to, set `STREAM_PROVIDER_URL` on the Vite or Vercel server to its API base. The adapter appends `/movie/<tmdb-id>` or `/tv/<tmdb-id>/<season>/<episode>` and includes an IMDb ID when available. Set `STREAM_PROVIDER_TOKEN` if the service accepts bearer authentication. The service must return resolved HTTPS URLs as `{ "sources": [...] }`; unresolved entries are omitted. Supported source types are `hls`, `mp4`, `webm`, and `embed`. Entries can include `name`, `quality`, `qualityVariants` (objects with `label` and `url`), and `subtitles` (objects with `label`, `language` or `lang`, and `url`).
+
+Set `STREAM_EMBED_ORIGINS` to a comma-separated list of trusted HTTPS iframe origins. Embedded players must allow framing and work in a sandbox. Direct media and subtitle hosts must permit requests from the frontend origin. The source service must provide fresh signed URLs where required. Keep provider credentials out of `VITE_` variables.
 
 ## Development playback
 
